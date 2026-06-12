@@ -1,12 +1,7 @@
-package com.campus_care.Campus_Care_Backend.domain;
+package com.campus_care.Campus_Care_Backend.dto;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+public class CategoriaDTO {
 
-@Document(collection = "categoria")
-public class Categoria {
-
-    @Id
     private String idCategoria;
     private String nombre;
     private String descripcion;
@@ -27,6 +22,7 @@ public class Categoria {
         this.nombre = nombre;
     }
 
+
     public String getDescripcion(){
         return descripcion;
     }
@@ -34,6 +30,4 @@ public class Categoria {
     public void setDescripcion(String descripcion){
         this.descripcion = descripcion;
     }
-
-
 }

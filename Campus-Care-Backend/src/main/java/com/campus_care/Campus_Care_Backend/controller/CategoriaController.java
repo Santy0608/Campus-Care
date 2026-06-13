@@ -46,7 +46,7 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaService.actualizarCategoria(categoriaDTO, idCategoria));
     }
 
-    @DeleteMapping("/{eliminar-categoria/{idCategoria}}")
+    @DeleteMapping("/eliminar-categoria/{idCategoria}")
     public ResponseEntity<CategoriaDTO> eliminarCategoria(@PathVariable String idCategoria){
         Optional<CategoriaDTO> categoriaOptional = categoriaService.buscarCategoriaPorId(idCategoria);
         if (categoriaOptional.isPresent()){

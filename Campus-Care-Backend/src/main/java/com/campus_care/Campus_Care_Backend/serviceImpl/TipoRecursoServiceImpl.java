@@ -21,7 +21,6 @@ public class TipoRecursoServiceImpl implements TipoRecursoService {
     private TiposRecursoRepository tiposRecursoRepository;
 
     @Override
-    @Transactional(readOnly = true)
     public List<TiposRecursoDTO> listadoTiposRecursos() {
         List<TiposRecurso> tiposRecursos = tiposRecursoRepository.findAll();
         List<TiposRecursoDTO> dtos = tiposRecursos
@@ -32,13 +31,11 @@ public class TipoRecursoServiceImpl implements TipoRecursoService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<TiposRecursoDTO> buscarTipoRecursoPorId(String id) {
         return tiposRecursoRepository.findById(id).map(this::convertirADTO);
     }
 
     @Override
-    @Transactional
     public TiposRecursoDTO agregarTipoRecurso(TiposRecursoDTO tiposRecursoDTO) {
         TiposRecurso tiposRecurso = new TiposRecurso();
         tiposRecurso.setNombre(tiposRecursoDTO.getNombre());
@@ -48,7 +45,6 @@ public class TipoRecursoServiceImpl implements TipoRecursoService {
     }
 
     @Override
-    @Transactional
     public TiposRecursoDTO actualizarTipoRecurso(TiposRecursoDTO tiposRecursoDTO, String id) {
         return tiposRecursoRepository.findById(id).map(tiposRecurso -> {
             tiposRecurso.setId(tiposRecursoDTO.getId());
@@ -61,7 +57,6 @@ public class TipoRecursoServiceImpl implements TipoRecursoService {
     }
 
     @Override
-    @Transactional
     public void eliminarTipoRecurso(String id) {
         tiposRecursoRepository.deleteById(id);
     }

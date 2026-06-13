@@ -54,5 +54,4 @@ public class TiposRecursoController {
         return ResponseEntity.notFound().build();
     }
 
-
 }

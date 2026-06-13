@@ -21,7 +21,6 @@ public class CategoriaServiceImpl implements CategoriaService {
     private CategoriaRepository categoriaRepository;
 
     @Override
-    @Transactional(readOnly = true)
     public List<CategoriaDTO> listadoCategorias() {
         List<Categoria> categorias = categoriaRepository.findAll();
         List<CategoriaDTO> dtos = categorias.stream()
@@ -31,13 +30,11 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<CategoriaDTO> buscarCategoriaPorId(String idCategoria) {
         return categoriaRepository.findById(idCategoria).map(this::convertirADTO);
     }
 
     @Override
-    @Transactional
     public CategoriaDTO guardarCategoria(CategoriaDTO categoriaDTO) {
         Categoria categoria = new Categoria();
         categoria.setNombre(categoriaDTO.getNombre());
@@ -47,7 +44,6 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
-    @Transactional
     public CategoriaDTO actualizarCategoria(CategoriaDTO categoriaDTO, String idCategoria) {
         return categoriaRepository.findById(idCategoria)
                 .map(categoria -> {
@@ -63,7 +59,6 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
-    @Transactional
     public void eliminarCategoriaPorId(String idCategoria) {
         categoriaRepository.deleteById(idCategoria);
     }

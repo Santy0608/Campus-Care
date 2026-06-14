@@ -62,43 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 
-<style>
-    body {
-        background-image: url('../../assets/images/listadoEstudiante.jpg');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        font-family: 'Segoe UI', sans-serif;
-    }
-
-    .usuarios-card {
-        background: rgba(255, 255, 255, 0.60);
-        backdrop-filter: blur(12px);
-        padding: 35px;
-        border-radius: 18px;
-        max-width: 900px;
-        margin: auto;
-        margin-top: 60px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.20);
-    }
-
-    h1 {
-        font-weight: 700;
-        color: #1f2d3d;
-        text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
-        margin-bottom: 25px;
-    }
-
-    label {
-        font-weight: 600;
-        color: #1f2d3d;
-    }
-
-    .btn-primary, .btn-secondary {
-        border-radius: 8px;
-        padding: 8px 20px;
-    }
-</style>
+<link rel="stylesheet" href="../../assets/css/editar_estudiantes.css">
 
 <div class="usuarios-card">
 

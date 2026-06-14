@@ -29,105 +29,7 @@ $recursos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
-<style>
-body {
-    background-image: url('../../assets/images/recursos.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    font-family: 'Segoe UI', sans-serif;
-}
-
-.contenedor-lista {
-    background: rgba(255, 255, 255, 0.60);
-    backdrop-filter: blur(12px);
-    padding: 35px;
-    border-radius: 18px;
-    max-width: 1400px;
-    margin: 60px auto;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.20);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.contenedor-lista:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 45px rgba(0,0,0,0.30);
-}
-
-h1 {
-    font-weight: 700;
-    font-size: 32px;
-    color: #1f2d3d;
-    text-align: center;
-    margin-bottom: 25px;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
-}
-
-.top-actions {
-    max-width: 1300px;
-    margin: auto;
-    margin-bottom: 22px;
-}
-
-.search-box input {
-    border-radius: 12px;
-    padding: 12px;
-    font-size: 15px;
-    border: 1px solid #c7c7c7;
-    transition: all .15s ease;
-}
-
-.search-box input:focus {
-    border-color: #003366;
-    box-shadow: 0 0 6px rgba(0,51,102,0.3);
-}
-
-table {
-    width: 100%;
-    background: white;
-    border-radius: 14px;
-    overflow: hidden;
-    border-collapse: separate;
-    border-spacing: 0;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.15);
-    font-size: 1rem;
-}
-
-thead {
-    background: #003366;
-    color: white;
-}
-
-thead th {
-    padding: 14px;
-    font-weight: 600;
-    text-align: center;
-}
-
-tbody tr {
-    transition: all 0.20s ease;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-tbody tr:hover {
-    background: rgba(0, 51, 102, 0.08);
-    transform: scale(1.002);
-}
-
-tbody td {
-    padding: 14px;
-    color: #1f2d3d;
-    font-size: 0.97rem;
-    text-align: center;
-}
-
-.btn-success, .btn-warning, .btn-danger, .btn-outline-primary {
-    border-radius: 10px;
-    padding: 10px 20px;
-    font-size: 15px;
-    font-weight: 600;
-}
-</style>
+<link rel="stylesheet" href="../../assets/css/listado_recursos.css">
 
 <div class="contenedor-lista">
 
@@ -207,31 +109,6 @@ tbody td {
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const botones = document.querySelectorAll('.btn-eliminar');
-
-    botones.forEach(boton => {
-        boton.addEventListener('click', function() {
-            const id = this.dataset.id;
-
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: 'Esta acción no se puede deshacer.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'eliminar_recurso.php?id_recurso=' + id;
-                }
-            });
-        });
-    });
-});
-</script>
+<script src="../../assets/js/listado_recursos.js"></script>
 
 <?php include ('../../includes/footer.php'); ?>

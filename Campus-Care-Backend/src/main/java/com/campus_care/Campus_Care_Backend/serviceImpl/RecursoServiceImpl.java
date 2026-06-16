@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,11 +35,26 @@ public class RecursoServiceImpl implements RecursoService {
     @Override
     public List<RecursosDTO> listadoRecursos() {
         List<Recursos> recursos = recursoRepository.findAll();
-        List<RecursosDTO> dtos = recursos
+
+        Set<String> categoriaIds = recursos.stream()
+                .map(Recursos::getCategoriaId)
+                .collect(Collectors.toSet());
+
+        Set<String> tipoIds = recursos.stream()
+                .map(Recursos::getTipoRecursoId)
+                .collect(Collectors.toSet());
+
+        Map<String, String> categoriasMap = categoriaRepository.findAllById(categoriaIds)
                 .stream()
-                .map(this::convertirADTO)
+                .collect(Collectors.toMap(Categoria::getIdCategoria, Categoria::getNombre));
+
+        Map<String, String> tiposMap = tiposRecursoRepository.findAllById(tipoIds)
+                .stream()
+                .collect(Collectors.toMap(TiposRecurso::getId, TiposRecurso::getNombre));
+
+        return recursos.stream()
+                .map(r -> convertirADTOListado(r, categoriasMap, tiposMap))
                 .collect(Collectors.toList());
-        return dtos;
     }
 
     @Override
@@ -107,10 +124,32 @@ public class RecursoServiceImpl implements RecursoService {
         dto.setContenido(recursos.getContenido());
         dto.setUrlEnlace(recursos.getUrlEnlace());
 
+        Categoria categoria = categoriaRepository.findById(recursos.getCategoriaId()).orElse(null);
         dto.setCategoriaId(recursos.getCategoriaId());
+        dto.setCategoriaNombre(categoria != null ? categoria.getNombre() : "Sin categoría");
+
+        TiposRecurso tipo = tiposRecursoRepository.findById(recursos.getTipoRecursoId()).orElse(null);
         dto.setTipoRecursoId(recursos.getTipoRecursoId());
+        dto.setTipoRecursoNombre(tipo != null ? tipo.getNombre() : "Sin tipo");
+
         dto.setFechaPublicacion(recursos.getFechaPublicacion());
         dto.setActivo(recursos.isActivo());
         return dto;
     }
+
+    RecursosDTO convertirADTOListado(Recursos recursos, Map<String, String> categoriasMap, Map<String, String> tiposMap) {
+        RecursosDTO dto = new RecursosDTO();
+        dto.setId(recursos.getId());
+        dto.setTitulo(recursos.getTitulo());
+        dto.setContenido(recursos.getContenido());
+        dto.setUrlEnlace(recursos.getUrlEnlace());
+        dto.setCategoriaId(recursos.getCategoriaId());
+        dto.setCategoriaNombre(categoriasMap.getOrDefault(recursos.getCategoriaId(), "Sin categoría"));
+        dto.setTipoRecursoId(recursos.getTipoRecursoId());
+        dto.setTipoRecursoNombre(tiposMap.getOrDefault(recursos.getTipoRecursoId(), "Sin tipo"));
+        dto.setFechaPublicacion(recursos.getFechaPublicacion());
+        dto.setActivo(recursos.isActivo());
+        return dto;
+    }
+
 }

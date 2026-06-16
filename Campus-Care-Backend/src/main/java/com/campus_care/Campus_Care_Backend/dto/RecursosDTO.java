@@ -21,6 +21,22 @@ public class RecursosDTO {
         return id;
     }
 
+    public String getTipoRecursoNombre(){
+        return tipoRecursoNombre;
+    }
+
+    public void setTipoRecursoNombre(String tipoRecursoNombre){
+        this.tipoRecursoNombre = tipoRecursoNombre;
+    }
+
+    public String getCategoriaNombre(){
+        return categoriaNombre;
+    }
+
+    public void setCategoriaNombre(String categoriaNombre){
+        this.categoriaNombre = categoriaNombre;
+    }
+
     public void setId(String id) {
         this.id = id;
     }

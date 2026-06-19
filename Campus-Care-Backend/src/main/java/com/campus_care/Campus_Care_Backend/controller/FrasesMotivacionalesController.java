@@ -38,12 +38,12 @@ public class FrasesMotivacionalesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(frasesMotivacionales);
     }
 
-    @PutMapping("/actualizar-frase-motivacional")
+    @PutMapping("/actualizar-frase-motivacional/{id}")
     public ResponseEntity<?> actualizarFraseMotivacional(@RequestBody FrasesMotivacionalesDTO frasesMotivacionales, @PathVariable String id){
         return ResponseEntity.ok(frasesMotivacionalesService.actualizarFraseMotivacional(frasesMotivacionales, id));
     }
 
-    @DeleteMapping("/eliminar-frase-motivacional")
+    @DeleteMapping("/eliminar-frase-motivacional/{id}")
     public ResponseEntity<FrasesMotivacionalesDTO> eliminarFraseMotivacionalPorId(@PathVariable String id){
         Optional<FrasesMotivacionalesDTO> fraseMotivacionalOptional = frasesMotivacionalesService.buscarFraseMotivacionalPorId(id);
         if (fraseMotivacionalOptional.isPresent()){

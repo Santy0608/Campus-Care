@@ -38,12 +38,12 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.guardarUsuario(usuarioDTO));
     }
 
-    @PutMapping("/actualizar-usuario")
+    @PutMapping("/actualizar-usuario/{id}")
     public ResponseEntity<?> actualizarUsuario(@RequestBody UsuarioDTO usuarioDTO, @PathVariable String id){
         return ResponseEntity.ok(usuarioService.actualizarUsuario(usuarioDTO, id));
     }
 
-    @DeleteMapping("/eliminar-usuario")
+    @DeleteMapping("/eliminar-usuario/{id}")
     public ResponseEntity<UsuarioDTO> eliminarUsuarioPorId(@PathVariable String id){
         Optional<UsuarioDTO> usuarioOptional = usuarioService.buscarUsuarioPorId(id);
         if (usuarioOptional.isPresent()){

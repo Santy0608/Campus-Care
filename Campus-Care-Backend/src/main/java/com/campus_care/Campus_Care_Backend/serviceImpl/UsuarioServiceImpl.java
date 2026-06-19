@@ -43,7 +43,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setContrasenia(usuarioDTO.getContrasenia());
         usuario.setRoles(usuarioDTO.getRoles());
         usuario.setPuntosTotales(usuarioDTO.getPuntosTotales());
-        usuario.setLogrosObtenidos(usuarioDTO.getLogrosObtenidos());
+    //    usuario.setLogrosObtenidos(usuarioDTO.getLogrosObtenidos());
         Usuario usuarioAgregado = usuarioRepository.save(usuario);
         return convertirADTO(usuarioAgregado);
     }
@@ -58,7 +58,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             usuario.setContrasenia(usuarioDTO.getContrasenia());
             usuario.setRoles(usuarioDTO.getRoles());
             usuario.setPuntosTotales(usuarioDTO.getPuntosTotales());
-            usuario.setLogrosObtenidos(usuarioDTO.getLogrosObtenidos());
+    //        usuario.setLogrosObtenidos(usuarioDTO.getLogrosObtenidos());
             Usuario usuarioActualizado = usuarioRepository.save(usuario);
             return convertirADTO(usuarioActualizado);
         })
@@ -79,7 +79,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         dto.setContrasenia(usuario.getContrasenia());
         dto.setRoles(usuario.getRoles());
         dto.setPuntosTotales(usuario.getPuntosTotales());
-        dto.setLogrosObtenidos(usuario.getLogrosObtenidos());
+  //      dto.setLogrosObtenidos(usuario.getLogrosObtenidos());
         return dto;
     }
 

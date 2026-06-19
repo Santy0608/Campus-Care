@@ -37,12 +37,12 @@ public class LineasApoyoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(lineasApoyoService.agregarLineaApoyo(lineasApoyoDTO));
     }
 
-    @PutMapping("/actualizar-linea-apoyo")
+    @PutMapping("/actualizar-linea-apoyo/{id}")
     public ResponseEntity<?> actualizarLineaApoyo(@RequestBody LineasApoyoDTO lineasApoyoDTO, @PathVariable String id){
         return ResponseEntity.ok(lineasApoyoService.actualizarLineaApoyo(lineasApoyoDTO, id));
     }
 
-    @DeleteMapping("/eliminar-linea-apoyo")
+    @DeleteMapping("/eliminar-linea-apoyo/{id}")
     public ResponseEntity<LineasApoyoDTO> eliminarLineaApoyo(@PathVariable String id){
         Optional<LineasApoyoDTO> lineasApoyoOptional = lineasApoyoService.buscarLineaApoyoPorId(id);
         if (lineasApoyoOptional.isPresent()){

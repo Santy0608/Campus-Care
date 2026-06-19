@@ -1,10 +1,13 @@
 package com.campus_care.Campus_Care_Backend.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
+
 
 @Document(collection = "usuarios")
 public class Usuario {
@@ -21,9 +24,6 @@ public class Usuario {
 
     @Field("puntos_totales")
     private int puntosTotales;
-
-    @Field("logros_obtenidos")
-    private List<LogroObtenido> logrosObtenidos;
 
     public String getId() {
         return id;
@@ -89,11 +89,5 @@ public class Usuario {
         this.puntosTotales = puntosTotales;
     }
 
-    public List<LogroObtenido> getLogrosObtenidos() {
-        return logrosObtenidos;
-    }
 
-    public void setLogrosObtenidos(List<LogroObtenido> logrosObtenidos) {
-        this.logrosObtenidos = logrosObtenidos;
-    }
 }

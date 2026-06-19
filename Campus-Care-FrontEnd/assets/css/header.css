@@ -1,0 +1,15 @@
+.navbar,
+.dropdown-menu {
+    z-index: 9999 !important;
+}
+
+.carousel,
+.carousel-item,
+.carousel-item img {
+    z-index: 1 !important;
+}
+
+.dropdown-menu {
+    border-radius: 10px;
+    padding: 8px 0;
+}

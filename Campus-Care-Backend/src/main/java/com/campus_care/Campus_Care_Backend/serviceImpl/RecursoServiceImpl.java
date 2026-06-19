@@ -151,5 +151,4 @@ public class RecursoServiceImpl implements RecursoService {
         dto.setActivo(recursos.isActivo());
         return dto;
     }
-
 }

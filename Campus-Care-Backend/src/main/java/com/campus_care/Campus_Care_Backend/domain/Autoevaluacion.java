@@ -6,20 +6,17 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Document(collection = "logros_usuario")
-public class LogroUsuario {
+@Document(collection = "autoevaluaciones")
+public class Autoevaluacion {
 
     @Id
-    private String id;
-
+    String id;
     @Field("id_usuario")
     private String idUsuario;
-
-    @Field("id_logro")
-    private String idLogro;
-
-    private Instant fechaDesbloqueo;
+    private Instant fechaEvaluacion;
+    private List<Respuesta> respuestas;
 
     public String getId() {
         return id;
@@ -37,19 +34,20 @@ public class LogroUsuario {
         this.idUsuario = idUsuario;
     }
 
-    public String getIdLogro() {
-        return idLogro;
+    public Instant getFechaEvaluacion() {
+        return fechaEvaluacion;
     }
 
-    public void setIdLogro(String idLogro) {
-        this.idLogro = idLogro;
+    public void setFechaEvaluacion(Instant fechaEvaluacion) {
+        this.fechaEvaluacion = fechaEvaluacion;
     }
 
-    public Instant getFechaDesbloqueo() {
-        return fechaDesbloqueo;
+    public List<Respuesta> getRespuestas() {
+        return respuestas;
     }
 
-    public void setFechaDesbloqueo(Instant fechaDesbloqueo) {
-        this.fechaDesbloqueo = fechaDesbloqueo;
+    public void setRespuestas(List<Respuesta> respuestas) {
+        this.respuestas = respuestas;
     }
 }
+

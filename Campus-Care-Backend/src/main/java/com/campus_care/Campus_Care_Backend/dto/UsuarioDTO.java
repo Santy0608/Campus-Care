@@ -1,6 +1,5 @@
 package com.campus_care.Campus_Care_Backend.dto;
 
-import com.campus_care.Campus_Care_Backend.domain.LogroObtenido;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -19,7 +18,6 @@ public class UsuarioDTO {
 
     private int puntosTotales;
 
-    private List<LogroObtenido> logrosObtenidos;
 
     public String getId() {
         return id;
@@ -83,14 +81,6 @@ public class UsuarioDTO {
 
     public void setPuntosTotales(int puntosTotales) {
         this.puntosTotales = puntosTotales;
-    }
-
-    public List<LogroObtenido> getLogrosObtenidos() {
-        return logrosObtenidos;
-    }
-
-    public void setLogrosObtenidos(List<LogroObtenido> logrosObtenidos) {
-        this.logrosObtenidos = logrosObtenidos;
     }
 
 }

@@ -53,4 +53,7 @@ public class CatalogoLogroController {
         return ResponseEntity.notFound().build();
     }
 
+    
+    
+
 }

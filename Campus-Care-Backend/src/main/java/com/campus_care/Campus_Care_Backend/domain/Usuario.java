@@ -14,10 +14,15 @@ public class Usuario {
 
     @Id
     private String id;
+    @Field("nombre")
     private String nombre;
+    @Field("apellido")
     private String apellido;
+    @Field("email")
     private String email;
+    @Field("nombreUsuario")
     private String nombreUsuario;
+    @Field("contrasenia")
     private String contrasenia;
 
     private List<String> roles;

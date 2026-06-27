@@ -148,7 +148,7 @@ public class AutoevaluacionServiceImpl implements AutoevaluacionService {
     AutoevaluacionDTO convertirADTO(Autoevaluacion autoevaluacion){
         AutoevaluacionDTO dto = new AutoevaluacionDTO();
         dto.setId(autoevaluacion.getId());
-        dto.setId(autoevaluacion.getIdUsuario());
+        dto.setIdUsuario(autoevaluacion.getIdUsuario());
         dto.setFechaEvaluacion(autoevaluacion.getFechaEvaluacion());
         List<RespuestaDTO> listaDtos = new ArrayList<>();
         for (Respuesta resp : autoevaluacion.getRespuestas()) {

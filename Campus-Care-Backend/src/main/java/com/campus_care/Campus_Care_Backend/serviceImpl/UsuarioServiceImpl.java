@@ -6,8 +6,10 @@ import com.campus_care.Campus_Care_Backend.repository.UsuarioRepository;
 import com.campus_care.Campus_Care_Backend.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,6 +20,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public List<UsuarioDTO> listadoUsuarios() {
@@ -40,10 +45,15 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setApellido(usuarioDTO.getApellido());
         usuario.setEmail(usuarioDTO.getEmail());
         usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
-        usuario.setContrasenia(usuarioDTO.getContrasenia());
-        usuario.setRoles(usuarioDTO.getRoles());
+        usuario.setContrasenia(passwordEncoder.encode(usuarioDTO.getContrasenia()));
+
+        List<String> roles = new ArrayList<>();
+        roles.add("ROLE_ESTUDIANTE");
+        if (usuarioDTO.isAdmin()){
+            roles.add("ROLE_ADMIN");
+        }
+        usuario.setRoles(roles);
         usuario.setPuntosTotales(usuarioDTO.getPuntosTotales());
-    //    usuario.setLogrosObtenidos(usuarioDTO.getLogrosObtenidos());
         Usuario usuarioAgregado = usuarioRepository.save(usuario);
         return convertirADTO(usuarioAgregado);
     }
@@ -55,10 +65,9 @@ public class UsuarioServiceImpl implements UsuarioService {
             usuario.setApellido(usuarioDTO.getApellido());
             usuario.setEmail(usuarioDTO.getEmail());
             usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
-            usuario.setContrasenia(usuarioDTO.getContrasenia());
-            usuario.setRoles(usuarioDTO.getRoles());
-            usuario.setPuntosTotales(usuarioDTO.getPuntosTotales());
-    //        usuario.setLogrosObtenidos(usuarioDTO.getLogrosObtenidos());
+            if (usuarioDTO.getContrasenia() != null && !usuarioDTO.getContrasenia().isBlank()) {
+                usuario.setContrasenia(passwordEncoder.encode(usuarioDTO.getContrasenia()));
+            }
             Usuario usuarioActualizado = usuarioRepository.save(usuario);
             return convertirADTO(usuarioActualizado);
         })

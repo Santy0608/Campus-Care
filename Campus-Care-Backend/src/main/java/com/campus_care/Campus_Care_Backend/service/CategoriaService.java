@@ -11,13 +11,13 @@ public interface CategoriaService {
 
     List<CategoriaDTO> listadoCategorias();
 
-    Optional<CategoriaDTO> buscarCategoriaPorId(String idCategoria);
+    Optional<CategoriaDTO> buscarCategoriaPorId(String id);
 
     CategoriaDTO guardarCategoria(CategoriaDTO categoriaDTO);
 
-    CategoriaDTO actualizarCategoria(CategoriaDTO categoriaDTO, String idCategoria);
+    CategoriaDTO actualizarCategoria(CategoriaDTO categoriaDTO, String id);
 
-    void eliminarCategoriaPorId(String idCategoria);
+    void eliminarCategoriaPorId(String id);
 
 
 

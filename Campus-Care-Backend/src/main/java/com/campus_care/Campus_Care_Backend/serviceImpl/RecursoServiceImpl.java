@@ -46,7 +46,7 @@ public class RecursoServiceImpl implements RecursoService {
 
         Map<String, String> categoriasMap = categoriaRepository.findAllById(categoriaIds)
                 .stream()
-                .collect(Collectors.toMap(Categoria::getIdCategoria, Categoria::getNombre));
+                .collect(Collectors.toMap(Categoria::getId, Categoria::getNombre));
 
         Map<String, String> tiposMap = tiposRecursoRepository.findAllById(tipoIds)
                 .stream()
@@ -75,7 +75,7 @@ public class RecursoServiceImpl implements RecursoService {
         TiposRecurso tiposRecurso = tiposRecursoRepository.findById(recursosDTO.getTipoRecursoId())
                 .orElseThrow(() -> new RuntimeException("Tipos de Recurso no encontrado"));
 
-        recurso.setCategoriaId(categoria.getIdCategoria());
+        recurso.setCategoriaId(categoria.getId());
         recurso.setTipoRecursoId(tiposRecurso.getId());
         recurso.setFechaPublicacion(LocalDateTime.now());
         recurso.setActivo(true);
@@ -100,7 +100,7 @@ public class RecursoServiceImpl implements RecursoService {
                     TiposRecurso tiposRecurso = tiposRecursoRepository.findById(recursosDTO.getTipoRecursoId())
                             .orElseThrow(() -> new RuntimeException("Tipos de Recurso no encontrado"));
 
-                    recursos.setCategoriaId(categoria.getIdCategoria());
+                    recursos.setCategoriaId(categoria.getId());
                     recursos.setTipoRecursoId(tiposRecurso.getId());
                     recursos.setFechaPublicacion(LocalDateTime.now());
                     recursos.setActivo(true);

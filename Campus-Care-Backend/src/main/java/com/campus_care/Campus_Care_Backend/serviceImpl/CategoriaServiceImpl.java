@@ -44,10 +44,10 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     @Override
-    public CategoriaDTO actualizarCategoria(CategoriaDTO categoriaDTO, String idCategoria) {
-        return categoriaRepository.findById(idCategoria)
+    public CategoriaDTO actualizarCategoria(CategoriaDTO categoriaDTO, String id) {
+        return categoriaRepository.findById(id)
                 .map(categoria -> {
-                    categoria.setIdCategoria(categoriaDTO.getIdCategoria());
+                    categoria.setId(categoriaDTO.getId());
                     categoria.setNombre(categoriaDTO.getNombre());
                     categoria.setDescripcion(categoriaDTO.getDescripcion());
 
@@ -55,17 +55,17 @@ public class CategoriaServiceImpl implements CategoriaService {
 
                     return convertirADTO(categoriaActualizada);
                 })
-                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con ID: " + idCategoria));
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada con ID: " + id));
     }
 
     @Override
-    public void eliminarCategoriaPorId(String idCategoria) {
-        categoriaRepository.deleteById(idCategoria);
+    public void eliminarCategoriaPorId(String id) {
+        categoriaRepository.deleteById(id);
     }
 
     CategoriaDTO convertirADTO(Categoria categoria){
         CategoriaDTO dto = new CategoriaDTO();
-        dto.setIdCategoria(categoria.getIdCategoria());
+        dto.setId(categoria.getId());
         dto.setNombre(categoria.getNombre());
         dto.setDescripcion(categoria.getDescripcion());
         return dto;

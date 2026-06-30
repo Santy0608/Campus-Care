@@ -26,9 +26,9 @@ public class CategoriaController {
         return categoriaService.listadoCategorias();
     }
 
-    @GetMapping("/{idCategoria}")
-    public ResponseEntity<CategoriaDTO> buscarCategoriaPorId(@PathVariable(name = "idCategoria") String idCategoria){
-        Optional<CategoriaDTO> categoriaOptional = categoriaService.buscarCategoriaPorId(idCategoria);
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoriaDTO> buscarCategoriaPorId(@PathVariable(name = "id") String id){
+        Optional<CategoriaDTO> categoriaOptional = categoriaService.buscarCategoriaPorId(id);
         if (categoriaOptional.isPresent()){
             return ResponseEntity.ok(categoriaOptional.orElseThrow());
         }
@@ -41,16 +41,16 @@ public class CategoriaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaCategoria);
     }
 
-    @PutMapping("/actualizar-categoria/{idCategoria}")
-    public ResponseEntity<?> actualizarCategoria(@RequestBody CategoriaDTO categoriaDTO, @PathVariable String idCategoria){
-        return ResponseEntity.ok(categoriaService.actualizarCategoria(categoriaDTO, idCategoria));
+    @PutMapping("/actualizar-categoria/{id}")
+    public ResponseEntity<?> actualizarCategoria(@RequestBody CategoriaDTO categoriaDTO, @PathVariable String id){
+        return ResponseEntity.ok(categoriaService.actualizarCategoria(categoriaDTO, id));
     }
 
-    @DeleteMapping("/eliminar-categoria/{idCategoria}")
-    public ResponseEntity<CategoriaDTO> eliminarCategoria(@PathVariable String idCategoria){
-        Optional<CategoriaDTO> categoriaOptional = categoriaService.buscarCategoriaPorId(idCategoria);
+    @DeleteMapping("/eliminar-categoria/{id}")
+    public ResponseEntity<CategoriaDTO> eliminarCategoria(@PathVariable String id){
+        Optional<CategoriaDTO> categoriaOptional = categoriaService.buscarCategoriaPorId(id);
         if (categoriaOptional.isPresent()){
-            categoriaService.eliminarCategoriaPorId(idCategoria);
+            categoriaService.eliminarCategoriaPorId(id);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();

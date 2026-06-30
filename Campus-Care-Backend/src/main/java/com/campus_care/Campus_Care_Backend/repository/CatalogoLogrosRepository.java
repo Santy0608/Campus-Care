@@ -12,7 +12,6 @@ public interface CatalogoLogrosRepository extends MongoRepository<CatalogoLogros
 
     List<CatalogoLogros> findByCriterioRacha(String criterioRacha);
 
-    Optional<CatalogoLogros> findByConceptos(String concepto);
 
 
 

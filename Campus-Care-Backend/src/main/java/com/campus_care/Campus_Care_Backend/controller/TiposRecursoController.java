@@ -34,7 +34,7 @@ public class TiposRecursoController {
         return ResponseEntity.notFound().build();
     }
 
-    @PostMapping
+    @PostMapping("/agregar-tipos-recurso")
     public ResponseEntity<?> guardarTiposRecurso(@RequestBody TiposRecursoDTO tiposRecursoDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(tipoRecursoService.agregarTipoRecurso(tiposRecursoDTO));
     }

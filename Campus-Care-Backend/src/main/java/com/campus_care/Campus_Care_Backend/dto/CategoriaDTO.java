@@ -2,16 +2,16 @@ package com.campus_care.Campus_Care_Backend.dto;
 
 public class CategoriaDTO {
 
-    private String idCategoria;
+    private String id;
     private String nombre;
     private String descripcion;
 
-    public String getIdCategoria(){
-        return idCategoria;
+    public String getId(){
+        return id;
     }
 
-    public void setIdCategoria(String idCategoria){
-        this.idCategoria = idCategoria;
+    public void setId(String id){
+        this.id = id;
     }
 
     public String getNombre(){

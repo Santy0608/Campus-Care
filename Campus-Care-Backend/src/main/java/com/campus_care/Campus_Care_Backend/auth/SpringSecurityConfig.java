@@ -58,7 +58,7 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.PUT,"/api/categorias/actualizar-categoria/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/categorias/eliminar-categoria/{id}").hasRole("ADMIN")
                         //Reglas para Autoevaluacion
-                        .requestMatchers(HttpMethod.POST,"/api/categorias/guardar-autoevaluacion").hasRole("ESTUDIANTE")
+                        .requestMatchers(HttpMethod.POST,"/api/autoevaluaciones/guardar-autoevaluacion").hasRole("ESTUDIANTE")
                         //Reglas para Catalogo Logros
                         .requestMatchers(HttpMethod.GET,"/api/catalogos-logros/listado-catalogos-logros").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/catalogos-logros/{id}").hasAnyRole("ESTUDIANTE","ADMIN")
@@ -98,6 +98,10 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/tipos-recurso/agregar-tipos-recurso").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/tipos-recurso/actualizar-tipos-recurso/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/tipos-recurso/eliminar-tipos-recurso/{id}").hasRole("ADMIN")
+                        //Reglas para Dashboard
+                        .requestMatchers(HttpMethod.GET,"/api/dashboard/estudiante/{idUsuario}").hasRole("ESTUDIANTE")
+
+
                         .anyRequest().authenticated())
                 .cors(cors -> cors.configurationSource(configurationSource()))
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))

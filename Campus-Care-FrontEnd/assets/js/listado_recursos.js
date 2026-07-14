@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${window.CampusCareApi.escapeHtml(formatearFecha(recurso.fechaPublicacion))}</td>
                 <td>${recurso.activo ? 'Sí' : 'No'}</td>
                 <td>
-                    <a href="actualizar_recurso.php?id_recurso=${encodeURIComponent(recurso.id || '')}"
+                    <a href="actualizar_recurso.html?id_recurso=${encodeURIComponent(recurso.id || '')}"
                        class="btn btn-warning btn-sm">Actualizar</a>
                     <button type="button" class="btn btn-danger btn-sm btn-eliminar" data-id="${window.CampusCareApi.escapeHtml(recurso.id || '')}">Eliminar</button>
                 </td>

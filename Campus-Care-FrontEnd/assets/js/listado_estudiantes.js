@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${window.CampusCareApi.escapeHtml(usuarioItem.nombreUsuario || '')}</td>
                     <td>${rol}</td>
                     <td>
-                        <a href="editar_estudiantes.php?id_usuario=${encodeURIComponent(usuarioItem.id || '')}"
+                        <a href="editar_estudiantes.html?id_usuario=${encodeURIComponent(usuarioItem.id || '')}"
                            class="btn btn-warning btn-sm">Editar</a>
                     </td>
                 </tr>`;

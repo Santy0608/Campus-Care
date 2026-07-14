@@ -53,10 +53,10 @@ function renderNavbar(usuario) {
                     <i class="fas fa-spa me-1"></i>Recursos (Admin)
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/modules/resources/listado_recursos.php">
+                    <li><a class="dropdown-item" href="/modules/resources/listado_recursos.html">
                         <i class="fas fa-list me-2"></i>Ver todos los recursos
                     </a></li>
-                    <li><a class="dropdown-item" href="/modules/resources/agregar_recurso.php">
+                    <li><a class="dropdown-item" href="/modules/resources/agregar_recurso.html">
                         <i class="fas fa-plus me-2"></i>Agregar nuevo recurso
                     </a></li>
                 </ul>
@@ -66,7 +66,7 @@ function renderNavbar(usuario) {
                     <i class="fas fa-users me-1"></i>Usuarios (Admin)
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/modules/admin/listado_estudiantes.php">
+                    <li><a class="dropdown-item" href="/modules/admin/listado_estudiantes.html">
                         <i class="fas fa-graduation-cap me-2"></i>Ver estudiantes
                     </a></li>
                 </ul>
@@ -76,10 +76,10 @@ function renderNavbar(usuario) {
                     <i class="fas fa-quote-right me-1"></i>Frases (Admin)
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/modules/alerts/listado_frases.php">
+                    <li><a class="dropdown-item" href="/modules/alerts/listado_frases.html">
                         <i class="fas fa-list me-2"></i>Ver todas las frases
                     </a></li>
-                    <li><a class="dropdown-item" href="/modules/alerts/agregar_frase.php">
+                    <li><a class="dropdown-item" href="/modules/alerts/agregar_frase.html">
                         <i class="fas fa-plus me-2"></i>Agregar nueva frase
                     </a></li>
                 </ul>

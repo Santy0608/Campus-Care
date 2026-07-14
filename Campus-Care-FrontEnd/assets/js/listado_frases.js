@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${window.CampusCareApi.escapeHtml(frase.autor || '')}</td>
                 <td>${frase.activo ? 'Activa' : 'Inactiva'}</td>
                 <td>
-                    <a href="actualizar_frase.php?id_frase=${encodeURIComponent(frase.id || '')}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="actualizar_frase.html?id_frase=${encodeURIComponent(frase.id || '')}" class="btn btn-warning btn-sm">Editar</a>
                     <button type="button" class="btn btn-danger btn-sm btn-eliminar" data-id="${window.CampusCareApi.escapeHtml(frase.id || '')}">Eliminar</button>
                 </td>
             </tr>

@@ -1,5 +1,7 @@
 package com.campus_care.Campus_Care_Backend.dto;
 
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
+
 import java.time.Instant;
 import java.util.List;
 
@@ -9,6 +11,15 @@ public class AutoevaluacionDTO {
     private String idUsuario;
     private Instant fechaEvaluacion;
     private List<RespuestaDTO> respuestas;
+    private Integer puntosGanados;
+
+    public Integer getPuntosGanados(){
+        return puntosGanados;
+    }
+
+    public void setPuntosGanados(Integer puntosGanados){
+        this.puntosGanados = puntosGanados;
+    }
 
     public String getId() {
         return id;

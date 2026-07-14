@@ -2,12 +2,16 @@ package com.campus_care.Campus_Care_Backend.serviceImpl;
 
 import com.campus_care.Campus_Care_Backend.domain.Autoevaluacion;
 import com.campus_care.Campus_Care_Backend.domain.Respuesta;
+import com.campus_care.Campus_Care_Backend.domain.TotalPuntos;
 import com.campus_care.Campus_Care_Backend.dto.DashboardDTO;
 import com.campus_care.Campus_Care_Backend.dto.MetricaSerieDTO;
 import com.campus_care.Campus_Care_Backend.repository.DashboardRepository;
+import com.campus_care.Campus_Care_Backend.repository.HistorialPuntosRepository;
+import com.campus_care.Campus_Care_Backend.service.AutoevaluacionService;
 import com.campus_care.Campus_Care_Backend.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -22,6 +26,12 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Autowired
     private DashboardRepository dashboardRepository;
+
+    @Autowired
+    private HistorialPuntosRepository historialPuntosRepository;
+
+    @Autowired
+    private AutoevaluacionService autoevaluacionService;
 
     @Override
     public DashboardDTO obtenerDashboardEstudiante(String idUsuario) {
@@ -86,6 +96,17 @@ public class DashboardServiceImpl implements DashboardService {
         DashboardDTO dashboard = new DashboardDTO();
         dashboard.setFechas(fechas);
         dashboard.setSeries(series);
+
+        dashboard.setRachaActual(autoevaluacionService.calcularRacha(idUsuario));
+        dashboard.setPuntosTotales(obtenerPuntosTotales(idUsuario));
+
         return dashboard;
+    }
+
+    @Override
+    public int obtenerPuntosTotales(String idUsuario) {
+        AggregationResults<TotalPuntos> resultado = historialPuntosRepository.sumarPuntosPorUsuario(idUsuario);
+        TotalPuntos total = resultado.getUniqueMappedResult();
+        return total != null ? total.getTotal() : 0;
     }
 }

@@ -8,6 +8,26 @@ public class DashboardDTO {
 
     private List<MetricaSerieDTO> series;
 
+    private int rachaActual;
+
+    private int puntosTotales;
+
+    public int getRachaActual(){
+        return rachaActual;
+    }
+
+    public void setRachaActual(int rachaActual){
+        this.rachaActual = rachaActual;
+    }
+
+    public int getPuntosTotales(){
+        return puntosTotales;
+    }
+
+    public void setPuntosTotales(int puntosTotales){
+        this.puntosTotales = puntosTotales;
+    }
+
     public List<String> getFechas() {
         return fechas;
     }

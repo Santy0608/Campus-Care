@@ -16,10 +16,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -59,7 +61,7 @@ public class AutoevaluacionServiceImpl implements AutoevaluacionService {
 
         Autoevaluacion autoevaluacion = new Autoevaluacion();
         autoevaluacion.setIdUsuario(idUsuario);
-        autoevaluacion.setFechaEvaluacion(autoevaluacionDTO.getFechaEvaluacion());
+        autoevaluacion.setFechaEvaluacion(Instant.now());
 
         List<Respuesta> listaDatos = new ArrayList<>();
         for (RespuestaDTO respuestaDTO : autoevaluacionDTO.getRespuestas()) {
@@ -79,6 +81,8 @@ public class AutoevaluacionServiceImpl implements AutoevaluacionService {
         historial.setConcepto("AUTOEVALUACION_DIARIA");
         historial.setFecha(Instant.now());
         historialPuntosRepository.save(historial);
+
+        int totalGanadoHoy = puntosGanados;
 
         int rachaActual = calcularRacha(idUsuario);
 
@@ -103,10 +107,26 @@ public class AutoevaluacionServiceImpl implements AutoevaluacionService {
             historialLogro.setFecha(Instant.now());
             historialPuntosRepository.save(historialLogro);
 
+            totalGanadoHoy += logro.getPuntosOtorgados();
+
         }
 
-        return convertirADTO(autoevaluacionAgregada);
+        AutoevaluacionDTO dto = convertirADTO(autoevaluacionAgregada);
+        dto.setPuntosGanados(totalGanadoHoy);
+        return dto;
 
+    }
+
+    @Override
+    public Optional<AutoevaluacionDTO> obtenerEvaluacionHoy(String usuarioId) {
+        LocalDate hoy = LocalDate.now(ZoneOffset.UTC);
+        Instant inicioDelDia = hoy.atStartOfDay(ZoneOffset.UTC).toInstant();
+        Instant finDelDia = hoy.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        Optional<Autoevaluacion> evaluacion = autoevaluacionRepository
+                .findByIdUsuarioAndFechaEvaluacionBetween(usuarioId, inicioDelDia, finDelDia);
+
+        return evaluacion.map(this::convertirADTO);
     }
 
     private int obtenerPuntosBase(){
@@ -117,29 +137,39 @@ public class AutoevaluacionServiceImpl implements AutoevaluacionService {
                 .orElse(50); //Fallback Configurable
     }
 
-    private int calcularRacha(String idUsuario){
+    @Override
+    public int calcularRacha(String idUsuario){
         List<Autoevaluacion> historial = autoevaluacionRepository
                 .findByIdUsuarioOrderByFechaEvaluacionDesc(idUsuario);
 
         if (historial.isEmpty()){
-            return 1;
+            return 0;
+        }
+
+        LocalDate hoy = LocalDate.now(ZoneOffset.UTC);
+        LocalDate fechaMasReciente = historial.get(0)
+                .getFechaEvaluacion()
+                .atZone(ZoneOffset.UTC)
+                .toLocalDate();
+
+        if (fechaMasReciente.isBefore(hoy.minusDays(1))) {
+            return 0;
         }
 
         int racha = 1;
+        LocalDate fechaEsperada = fechaMasReciente.minusDays(1);
 
-        LocalDate fechaEsperada = LocalDate.now(ZoneOffset.UTC).minusDays(1);
-
-        for(int i = 1; i < historial.size(); i++){
+        for (int i = 1; i < historial.size(); i++) {
             LocalDate fechaEvaluacion = historial.get(i)
                     .getFechaEvaluacion()
                     .atZone(ZoneOffset.UTC)
                     .toLocalDate();
 
-            if (fechaEvaluacion.equals(fechaEsperada)){
+            if (fechaEvaluacion.equals(fechaEsperada)) {
                 racha++;
                 fechaEsperada = fechaEsperada.minusDays(1);
             } else {
-                break; // racha rota
+                break;
             }
         }
         return racha;

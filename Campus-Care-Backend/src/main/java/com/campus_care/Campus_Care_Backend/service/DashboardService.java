@@ -6,4 +6,6 @@ public interface DashboardService {
 
     DashboardDTO obtenerDashboardEstudiante(String idUsuario);
 
+    int obtenerPuntosTotales(String idUsuario);
+
 }

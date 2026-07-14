@@ -22,5 +22,6 @@ public interface AutoevaluacionRepository extends MongoRepository<Autoevaluacion
             String idUsuario
     );
 
+    Optional<Autoevaluacion> findByUsuarioIdAndFechaBetween(String usuarioId, Instant inicio, Instant fin);
 
 }

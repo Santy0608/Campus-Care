@@ -42,7 +42,7 @@ public class FraseMotivacionalServiceImpl implements FrasesMotivacionalesService
         frasesMotivacionales.setAutor(frasesMotivacionalesDTO.getAutor());
         frasesMotivacionales.setActivo(true);
         FrasesMotivacionales fraseMotivacionalAgregada = frasesMotivacionalesRepository.save(frasesMotivacionales);
-        return convertirADTO(frasesMotivacionales);
+        return convertirADTO(fraseMotivacionalAgregada);
     }
 
     @Override
@@ -53,7 +53,8 @@ public class FraseMotivacionalServiceImpl implements FrasesMotivacionalesService
                     frasesMotivacionales.setTexto(frasesMotivacionalesDTO.getTexto());
                     frasesMotivacionales.setAutor(frasesMotivacionalesDTO.getAutor());
                     frasesMotivacionales.setActivo(true);
-                    return convertirADTO(frasesMotivacionales);
+                    FrasesMotivacionales fraseMotivacionalActualizada = frasesMotivacionalesRepository.save(frasesMotivacionales);
+                    return convertirADTO(fraseMotivacionalActualizada);
                 })
                 .orElseThrow(() -> new RuntimeException("Frase Motivacional no encontrada con ID: " + id));
 

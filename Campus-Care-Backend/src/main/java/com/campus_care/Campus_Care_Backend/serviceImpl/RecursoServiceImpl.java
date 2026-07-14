@@ -78,7 +78,7 @@ public class RecursoServiceImpl implements RecursoService {
         recurso.setCategoriaId(categoria.getId());
         recurso.setTipoRecursoId(tiposRecurso.getId());
         recurso.setFechaPublicacion(LocalDateTime.now());
-        recurso.setActivo(true);
+        recurso.setActivo(recursosDTO.isActivo());
 
         Recursos recursoGuardado = recursoRepository.save(recurso);
 
@@ -103,7 +103,7 @@ public class RecursoServiceImpl implements RecursoService {
                     recursos.setCategoriaId(categoria.getId());
                     recursos.setTipoRecursoId(tiposRecurso.getId());
                     recursos.setFechaPublicacion(LocalDateTime.now());
-                    recursos.setActivo(true);
+                    recursos.setActivo(recursosDTO.isActivo());
 
                     Recursos recursoActualizado = recursoRepository.save(recursos);
                     return convertirADTO(recursoActualizado);

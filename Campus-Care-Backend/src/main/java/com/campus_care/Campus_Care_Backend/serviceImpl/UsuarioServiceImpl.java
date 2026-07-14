@@ -65,6 +65,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             usuario.setApellido(usuarioDTO.getApellido());
             usuario.setEmail(usuarioDTO.getEmail());
             usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
+            usuario.setRoles(construirRoles(usuarioDTO.isAdmin()));
             if (usuarioDTO.getContrasenia() != null && !usuarioDTO.getContrasenia().isBlank()) {
                 usuario.setContrasenia(passwordEncoder.encode(usuarioDTO.getContrasenia()));
             }
@@ -81,15 +82,24 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     UsuarioDTO  convertirADTO(Usuario usuario){
         UsuarioDTO dto = new UsuarioDTO();
+        dto.setId(usuario.getId());
         dto.setNombre(usuario.getNombre());
         dto.setApellido(usuario.getApellido());
         dto.setEmail(usuario.getEmail());
         dto.setNombreUsuario(usuario.getNombreUsuario());
-        dto.setContrasenia(usuario.getContrasenia());
         dto.setRoles(usuario.getRoles());
         dto.setPuntosTotales(usuario.getPuntosTotales());
-  //      dto.setLogrosObtenidos(usuario.getLogrosObtenidos());
+        dto.setAdmin(usuario.getRoles() != null && usuario.getRoles().contains("ROLE_ADMIN"));
         return dto;
+    }
+
+    private List<String> construirRoles(boolean admin) {
+        List<String> roles = new ArrayList<>();
+        roles.add("ROLE_ESTUDIANTE");
+        if (admin) {
+            roles.add("ROLE_ADMIN");
+        }
+        return roles;
     }
 
 }

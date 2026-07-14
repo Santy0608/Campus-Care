@@ -1,83 +1,41 @@
-<?php
-
-include '../../includes/auth.php';
-validarAcceso('admin');
-require_once(__DIR__ . '/../../includes/db.php');
-include ('../../includes/header.php');
-
-
-$descripcion = $activo = '';
-$errores = [];
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-
-    if (empty($_POST['descripcion'])){
-        $errores['descripcion'] = 'La descripción es obligatoria';
-    } else {
-        $descripcion = trim($_POST['descripcion']);
-    }
-
-    $fecha_publicacion = date('Y-m-d H:i:s');
-    $activo = trim($_POST['activo']);
-
-    if (empty($errores)){
-        try {
-            $sql = 'INSERT INTO frases (descripcion, fecha_publicacion, activo) 
-                    VALUES (:descripcion, :fecha_publicacion, :activo)';
-
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                'descripcion' => $descripcion,
-                'fecha_publicacion' => $fecha_publicacion,
-                'activo' => $activo
-            ]);
-
-            echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
-            echo "<script>
-                Swal.fire({
-                    title: 'Frase agregada',
-                    text: 'La frase se ha agregado correctamente.',
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar'
-                }).then(() => {
-                    window.location.href = '/modules/alerts/agregar_frase.php';
-                });
-            </script>";
-            exit;
-        } catch (PDOException $e){
-            echo 'Error: ' . $e->getMessage();
-        }
-    }
-}
-?>
+<?php include '../../includes/header.php'; ?>
 
 <link rel="stylesheet" href="../../assets/css/agregar_frase.css">
 
 <div class="form-wrapper">
     <h2>Agregar Frase</h2>
 
-    <form method="post" action="agregar_frase.php">
+    <div id="fraseMensaje" class="alert d-none" role="alert"></div>
+
+    <form id="agregarFraseForm">
         
         <div class="mb-3">
-            <label for="descripcion" class="form-label">Descripción</label>
+            <label for="texto" class="form-label">Texto</label>
             <input 
                 type="text" 
                 class="form-control" 
-                name="descripcion" 
-                id="descripcion"
-                value="<?php echo htmlspecialchars($descripcion ?? ''); ?>" 
+                name="texto" 
+                id="texto"
                 required
             >
-            <?php if (isset($errores['descripcion'])): ?>
-                <p class="error"><?php echo $errores['descripcion']; ?></p>
-            <?php endif; ?>
+        </div>
+
+        <div class="mb-3">
+            <label for="autor" class="form-label">Autor</label>
+            <input
+                type="text"
+                class="form-control"
+                name="autor"
+                id="autor"
+                required
+            >
         </div>
 
         <div class="mb-3">
             <label for="activo" class="form-label">Estado</label>
             <select name="activo" class="form-select" id="activo">
-                <option value="1">Activo (Publicado)</option>
-                <option value="0" <?php echo ($activo ?? 1) == 0 ? 'selected' : ''; ?>>
+                <option value="true">Activo (Publicado)</option>
+                <option value="false">
                     Inactivo (Borrador)
                 </option>
             </select>
@@ -90,4 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
     </form>
 </div>
 
-<?php include ('../../includes/footer.php'); ?>
+<script src="../../assets/js/agregar_frase.js"></script>
+
+<?php include '../../includes/footer.php'; ?>

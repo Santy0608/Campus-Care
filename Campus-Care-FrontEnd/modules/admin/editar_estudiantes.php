@@ -1,66 +1,4 @@
-<?php
-include '../../includes/auth.php';
-validarAcceso('admin');
-require '../../includes/db.php';
-include '../../includes/header.php';
-
-if (!isset($_GET['id_usuario'])) {
-    echo "<div class='alert alert-danger text-center mt-4'>No se ha especificado ningún usuario.</div>";
-    exit;
-}
-
-$id_usuario = intval($_GET['id_usuario']);
-$mensaje = "";
-
-try {
-    $stmt = $pdo->prepare("SELECT id_usuario, nombre, apellido, telefono, role FROM usuarios WHERE id_usuario = :id_usuario");
-    $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
-    $stmt->execute();
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$usuario) {
-        echo "<div class='alert alert-warning text-center mt-4'>Usuario no encontrado.</div>";
-        exit;
-    }
-} catch (PDOException $e) {
-    echo "<div class='alert alert-danger'>Error al cargar usuario: " . $e->getMessage() . "</div>";
-    exit;
-}
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $nombre = $_POST['nombre'] ?? '';
-    $apellido = $_POST['apellido'] ?? '';
-    $telefono = $_POST['telefono'] ?? '';
-    $role = $_POST['role'] ?? '';
-
-    if (!empty($nombre) && !empty($apellido) && !empty($telefono)) {
-        try {
-            $update = $pdo->prepare("UPDATE usuarios 
-                                     SET nombre = :nombre, apellido = :apellido, telefono = :telefono, 
-                                        role = :role 
-                                     WHERE id_usuario = :id_usuario");
-            $update->bindParam(':nombre', $nombre);
-            $update->bindParam(':apellido', $apellido);
-            $update->bindParam(':telefono', $telefono);
-            $update->bindParam(':role', $role);
-            $update->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
-            $update->execute();
-
-            $mensaje = "<div class='alert alert-success text-center'>Usuario actualizado correctamente.</div>";
-
-            $usuario['nombre'] = $nombre;
-            $usuario['apellido'] = $apellido;
-            $usuario['telefono'] = $telefono;
-            $usuario['role'] = $role;
-
-        } catch (PDOException $e) {
-            $mensaje = "<div class='alert alert-danger text-center'>Error al actualizar usuario: " . $e->getMessage() . "</div>";
-        }
-    } else {
-        $mensaje = "<div class='alert alert-warning text-center'>Por favor complete todos los campos obligatorios.</div>";
-    }
-}
-?>
+<?php include '../../includes/header.php'; ?>
 
 <link rel="stylesheet" href="../../assets/css/editar_estudiantes.css">
 
@@ -70,33 +8,41 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <h1>Editar Usuario</h1>
     </div>
 
-    <?= $mensaje ?>
+    <div id="usuarioMensaje" class="alert d-none" role="alert"></div>
 
-    <form method="POST">
+    <form id="editarUsuarioForm">
 
         <div class="mb-3">
             <label class="form-label">Nombre:</label>
-            <input type="text" name="nombre" class="form-control" 
-                   value="<?= htmlspecialchars($usuario['nombre']) ?>" required>
+            <input type="text" name="nombre" id="nombre" class="form-control" required>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Apellido:</label>
-            <input type="text" name="apellido" class="form-control" 
-                   value="<?= htmlspecialchars($usuario['apellido']) ?>" required>
+            <input type="text" name="apellido" id="apellido" class="form-control" required>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Teléfono:</label>
-            <input type="text" name="telefono" class="form-control" 
-                   value="<?= htmlspecialchars($usuario['telefono']) ?>" required>
+            <label class="form-label">Correo:</label>
+            <input type="email" name="email" id="email" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Nombre de usuario:</label>
+            <input type="text" name="nombreUsuario" id="nombreUsuario" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Nueva contraseña:</label>
+            <input type="password" name="contrasenia" id="contrasenia" class="form-control"
+                   placeholder="Deje este campo vacio para conservar la actual">
         </div>
 
         <div class="mb-3">
             <label class="form-label">Rol:</label>
-            <select name="role" class="form-select">
-                <option value="estudiante" <?= $usuario['role'] === 'estudiante' ? 'selected' : '' ?>>Estudiante</option>
-                <option value="admin" <?= $usuario['role'] === 'admin' ? 'selected' : '' ?>>Administrador</option>
+            <select name="role" id="role" class="form-select">
+                <option value="estudiante">Estudiante</option>
+                <option value="admin">Administrador</option>
             </select>
         </div>
 
@@ -108,5 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </form>
 
 </div>
+
+<script src="../../assets/js/editar_estudiantes.js"></script>
 
 <?php include '../../includes/footer.php'; ?>

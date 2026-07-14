@@ -6,8 +6,8 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // Si ya hay sesión, redirigir al inicio
-    if (sessionStorage.getItem('usuario')) {
-        window.location.href = '../index.html';
+    if (sessionStorage.getItem('usuario') && sessionStorage.getItem('token')) {
+        window.location.href = '/';
         return;
     }
 
@@ -27,30 +27,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                /*
-                 * TODO: apuntar a tu endpoint real de autenticación.
-                 * El endpoint debe recibir { nombre_usuario, contrasenia }
-                 * y devolver { ok: true, usuario: { id, nombre, role } }
-                 * o { ok: false, mensaje: '...' }.
-                 */
-                const resp = await fetch('/api/login', {
+                const data = await window.CampusCareApi.request('/login', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre_usuario: usuario, contrasenia })
+                    body: { nombreUsuario: usuario, contrasenia }
                 });
 
-                const data = await resp.json();
-
-                if (data.ok) {
-                    // Guardar sesión en sessionStorage
-                    sessionStorage.setItem('usuario', JSON.stringify(data.usuario));
-                    window.location.href = '../index.html';
-                } else {
-                    mostrarError(msgArea, data.mensaje || 'Usuario o contraseña incorrectos.');
-                }
+                window.CampusCareApi.storeAuthSession(data);
+                window.location.href = '/';
             } catch (err) {
                 console.error('Error de login:', err);
-                mostrarError(msgArea, 'No se pudo conectar con el servidor. Intenta de nuevo.');
+                mostrarError(msgArea, err.message || 'No se pudo conectar con el servidor. Intenta de nuevo.');
             }
         });
     }

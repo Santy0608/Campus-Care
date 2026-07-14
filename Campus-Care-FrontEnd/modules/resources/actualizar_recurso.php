@@ -1,102 +1,4 @@
-<?php
-
-include '../../includes/auth.php';
-validarAcceso('admin');
-require_once(__DIR__ . '/../../includes/db.php');
-include('../../includes/header.php');
-
-$id_recurso = $_GET['id_recurso'] ?? null;
-
-if (!$id_recurso){
-    header('location: listado_recursos.php');
-    exit;
-}
-
-$errores = [];
-
-try {
-    $stmt = $pdo->prepare('SELECT * FROM recursos WHERE id_recurso = :id_recurso');
-    $stmt->execute(['id_recurso' => $id_recurso]);
-    $recurso = $stmt->fetch();
-
-    if (!$recurso){
-        echo "Recurso no encontrado";
-        exit;
-    }
-
-    $titulo            = $recurso['titulo'];
-    $tipo              = $recurso['tipo'];
-    $contenido         = $recurso['contenido'];
-    $url_enlace        = $recurso['url_enlace'];
-    $categoria         = $recurso['categoria'];
-    $fecha_publicacion = $recurso['fecha_publicacion'];
-    $activo            = $recurso['activo'];
-
-} catch(PDOException $e){
-    echo "Error al obtener el recurso " . $e->getMessage();
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-    
-    $titulo     = trim($_POST['titulo']);
-    $tipo       = trim($_POST['tipo']);
-    $contenido  = trim($_POST['contenido']);
-    $url_enlace = trim($_POST['url_enlace']);
-    $categoria  = trim($_POST['categoria']);
-    $activo     = trim($_POST['activo']);
-    $fecha_publicacion = date('Y-m-d H:i:s');
-
-    if (!$titulo)     $errores['titulo'] = 'El título es obligatorio';
-    if (!$tipo)       $errores['tipo'] = 'El tipo es obligatorio';
-    if (!$contenido)  $errores['contenido'] = 'El contenido es obligatorio';
-    if (!$url_enlace) $errores['url_enlace'] = 'La URL es obligatoria';
-    if (!$categoria)  $errores['categoria'] = 'La categoría es obligatoria';
-
-    if (empty($errores)){
-        try {
-            $sql = "UPDATE recursos 
-                    SET titulo = :titulo,
-                        tipo = :tipo,
-                        contenido = :contenido,
-                        url_enlace = :url_enlace,
-                        categoria = :categoria,
-                        fecha_publicacion = :fecha_publicacion,
-                        activo = :activo
-                    WHERE id_recurso = :id_recurso";
-
-            $stmt = $pdo->prepare($sql);
-
-            $stmt->execute([
-                'titulo' => $titulo,
-                'tipo' => $tipo,
-                'contenido' => $contenido,
-                'url_enlace' => $url_enlace,
-                'categoria' => $categoria,
-                'fecha_publicacion' => $fecha_publicacion,
-                'activo' => $activo,
-                'id_recurso' => $id_recurso
-            ]);
-
-            echo "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>";
-            echo "<script>
-                Swal.fire({
-                    title: 'Recurso actualizado',
-                    text: 'Los cambios se han guardado correctamente.',
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar'
-                }).then(() => {
-                    window.location.href = '/modules/resources/listado_recursos.php';
-                });
-            </script>";
-            exit;
-
-        } catch(PDOException $e){
-            echo "Error al actualizar el recurso: " . $e->getMessage();
-        }
-    }
-}
-
-?>
+<?php include '../../includes/header.php'; ?>
 
 <link rel="stylesheet" href="../../assets/css/actualizar_recurso.css">
 
@@ -104,57 +6,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 
     <h2>Actualizar Recurso</h2>
 
-    <form method="post">
+    <div id="recursoMensaje" class="alert d-none" role="alert"></div>
+
+    <form id="actualizarRecursoForm">
 
         <div class="mb-3">
             <label for="titulo">Título</label>
-            <input type="text" id="titulo" name="titulo" class="form-control" value="<?= htmlspecialchars($titulo); ?>">
-            <?php if(isset($errores['titulo'])): ?>
-            <p class="error"><?= $errores['titulo']; ?></p>
-            <?php endif; ?>
+            <input type="text" id="titulo" name="titulo" class="form-control" required>
         </div>
 
         <div class="mb-3">
-            <label for="tipo">Tipo de Recurso</label>
-            <select id="tipo" name="tipo" class="form-select">
-                <option value="">-- Seleccione el Tipo --</option>
-                <option value="articulo" <?= $tipo === 'articulo' ? 'selected' : '' ?>>Artículo de Texto</option>
-                <option value="video" <?= $tipo === 'video' ? 'selected' : '' ?>>Video Embebido</option>
-                <option value="ejercicio" <?= $tipo === 'ejercicio' ? 'selected' : '' ?>>Ejercicio Interactivo</option>
+            <label for="tipoRecursoId">Tipo de Recurso</label>
+            <select id="tipoRecursoId" name="tipoRecursoId" class="form-select" required>
+                <option value="">Cargando tipos de recurso...</option>
             </select>
         </div>
 
         <div class="mb-3">
-            <label for="categoria">Categoría</label>
-            <select id="categoria" name="categoria" class="form-select">
-                <option value="">-- Seleccione la Categoría --</option>
-                <option value="estres" <?= $categoria === 'estres' ? 'selected' : '' ?>>Estrés</option>
-                <option value="ansiedad" <?= $categoria === 'ansiedad' ? 'selected' : '' ?>>Ansiedad</option>
-                <option value="sueno" <?= $categoria === 'sueno' ? 'selected' : '' ?>>Sueño</option>
-                <option value="estado_animo" <?= $categoria === 'estado_animo' ? 'selected' : '' ?>>Estado de Ánimo
-                </option>
-                <option value="relaciones" <?= $categoria === 'relaciones' ? 'selected' : '' ?>>Relaciones</option>
-                <option value="motivacion" <?= $categoria === 'motivacion' ? 'selected' : '' ?>>Motivación</option>
+            <label for="categoriaId">Categoría</label>
+            <select id="categoriaId" name="categoriaId" class="form-select" required>
+                <option value="">Cargando categorias...</option>
             </select>
         </div>
 
         <div class="mb-3">
             <label for="contenido">Contenido</label>
             <textarea id="contenido" name="contenido" rows="8"
-                class="form-control"><?= htmlspecialchars($contenido); ?></textarea>
+                class="form-control" required></textarea>
         </div>
 
         <div class="mb-3">
             <label for="url_enlace">URL o Enlace</label>
             <input type="url" id="url_enlace" name="url_enlace" class="form-control"
-                value="<?= htmlspecialchars($url_enlace); ?>">
+                required>
         </div>
 
         <div class="mb-3">
             <label for="activo">Estado</label>
             <select id="activo" name="activo" class="form-select">
-                <option value="1" <?= $activo == 1 ? 'selected' : '' ?>>Activo</option>
-                <option value="0" <?= $activo == 0 ? 'selected' : '' ?>>Inactivo</option>
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
             </select>
         </div>
 
@@ -164,4 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
     </form>
 </div>
 
-<?php include('../../includes/footer.php'); ?>
+<script src="../../assets/js/actualizar_recurso.js"></script>
+
+<?php include '../../includes/footer.php'; ?>

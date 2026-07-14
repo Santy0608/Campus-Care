@@ -34,8 +34,8 @@ public class FrasesMotivacionalesController {
     }
 
     @PostMapping("/agregar-frase-motivacional")
-    public ResponseEntity<?> guardarFraseMotivacionalPorId(@RequestBody FrasesMotivacionales frasesMotivacionales){
-        return ResponseEntity.status(HttpStatus.CREATED).body(frasesMotivacionales);
+    public ResponseEntity<?> guardarFraseMotivacionalPorId(@RequestBody FrasesMotivacionalesDTO frasesMotivacionales){
+        return ResponseEntity.status(HttpStatus.CREATED).body(frasesMotivacionalesService.guardarFraseMotivacional(frasesMotivacionales));
     }
 
     @PutMapping("/actualizar-frase-motivacional/{id}")
@@ -47,7 +47,8 @@ public class FrasesMotivacionalesController {
     public ResponseEntity<FrasesMotivacionalesDTO> eliminarFraseMotivacionalPorId(@PathVariable String id){
         Optional<FrasesMotivacionalesDTO> fraseMotivacionalOptional = frasesMotivacionalesService.buscarFraseMotivacionalPorId(id);
         if (fraseMotivacionalOptional.isPresent()){
-            return ResponseEntity.ok(fraseMotivacionalOptional.orElseThrow());
+            frasesMotivacionalesService.eliminarFraseMotivacionalPorId(id);
+            return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
     }

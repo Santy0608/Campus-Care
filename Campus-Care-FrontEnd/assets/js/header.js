@@ -27,22 +27,22 @@ function renderNavbar(usuario) {
     if (usuario && usuario.role === 'estudiante') {
         roleLinks = `
             <li class="nav-item">
-                <a class="nav-link" href="/modules/autoevaluacion/autoevaluacion.php" title="Evalua tu estado emocional">
+                <a class="nav-link" href="/modules/autoevaluacion/autoevaluacion.html" title="Evalua tu estado emocional">
                     <i class="fas fa-heart me-1"></i>Autoevaluación
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/modules/dashboard/dashboard_progreso.php" title="Ve tu progreso emocional">
+                <a class="nav-link" href="/modules/dashboard/dashboard_progreso.html" title="Ve tu progreso emocional">
                     <i class="fas fa-chart-line me-1"></i>Mi Progreso
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/modules/diario/indexDiario.php" title="Registra tus reflexiones">
+                <a class="nav-link" href="/modules/diario/indexDiario.html" title="Registra tus reflexiones">
                     <i class="fas fa-book-open me-1"></i>Mi Diario
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/modules/resources_student/recursos_estudiantes.php" title="Recursos de bienestar">
+                <a class="nav-link" href="/modules/resources_student/recursos_estudiantes.html" title="Recursos de bienestar">
                     <i class="fas fa-seedling me-1"></i>Mis Recursos
                 </a>
             </li>`;
@@ -85,7 +85,7 @@ function renderNavbar(usuario) {
                 </ul>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/modules/dashboard_admin/dashboard_admin.php" title="Dashboard">
+                <a class="nav-link" href="/modules/dashboard_admin/dashboard_admin.html" title="Dashboard">
                     <i class="fas fa-chart-line me-1"></i>Dashboard
                 </a>
             </li>`;

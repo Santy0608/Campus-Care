@@ -31,3 +31,12 @@ document.addEventListener('DOMContentLoaded', function () {
         container.innerHTML = '<div class="alert alert-info text-center mt-3" role="alert"><i class="fas fa-info-circle me-2"></i> Aún no hay suficientes evaluaciones para mostrar el gráfico poblacional.</div>';
     }
 });
+
+
+
+
+
+
+
+
+

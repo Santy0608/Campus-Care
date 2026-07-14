@@ -1,45 +1,199 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const ranges = document.querySelectorAll('.form-range');
+const CATEGORIAS = [
+    { metrica: 'ESTRES', label: '😣 Nivel de Estrés', icono: '😣', nombre: 'Estrés' },
+    { metrica: 'ANSIEDAD', label: '😟 Nivel de Ansiedad', icono: '😟', nombre: 'Ansiedad' },
+    { metrica: 'SUENO', label: '😴 Calidad del Sueño', icono: '😴', nombre: 'Sueño' },
+    { metrica: 'ANIMO', label: '😊 Estado de Ánimo General', icono: '😊', nombre: 'Ánimo' },
+    { metrica: 'RELACIONES', label: '💕 Calidad de Relaciones', icono: '💕', nombre: 'Relaciones' },
+    { metrica: 'MOTIVACION', label: '💪 Nivel de Motivación', icono: '💪', nombre: 'Motivación' },
+];
 
-    ranges.forEach(range => {
-        function updateValue() {
-            const valueElement = document.getElementById('value_' + range.id);
-            if (valueElement) {
-                valueElement.textContent = range.value;
-                const percentage = ((range.value - range.min) / (range.max - range.min)) * 100;
-                range.style.setProperty('--thumb-position', percentage + '%');
-            }
-        }
 
-        range.addEventListener('input', updateValue);
-        range.addEventListener('change', updateValue);
-        updateValue();
-    });
+document.addEventListener('DOMContentLoaded', async () => {
+    const usuario = window.CampusCareApi.requireRole('estudiante'); // ajustá el rol si aplica
+    if (!usuario) return;
 
-    const cards = document.querySelectorAll('.category-card');
-    cards.forEach((card, index) => {
-        card.style.animationDelay = (index * 0.1) + 's';
-        card.classList.add('fade-in');
-    });
-});
+    const form = document.getElementById('formEvaluacion');
+    const resumen = document.getElementById('resumenEvaluacion');
+    const errorBox = document.getElementById('mensajeError');
 
-function validateForm() {
-    const ranges = document.querySelectorAll('.form-range');
-    let isValid = true;
+    renderFormulario();
+    await cargarEstadoHoy();
 
-    ranges.forEach(range => {
-        if (!range.value || range.value < 1 || range.value > 5) {
-            isValid = false;
-            range.style.borderColor = '#ff6b6b';
-        } else {
-            range.style.borderColor = '';
-        }
-    });
+    function renderFormulario() {
+        const container = document.getElementById('categoriasContainer');
+        container.innerHTML = CATEGORIAS.map(cat => `
+        <div class="category-card">
+            <div class="category-label">${cat.label}</div>
+            <div class="range-container">
+                <div class="range-labels">
+                    <span class="range-label">1 (Malo)</span>
+                    <span class="range-label">5 (Excelente)</span>
+                </div>
+                <input type="range" class="form-range" min="1" max="5" value="3"
+                    name="${cat.metrica}" id="${cat.metrica}">
+                <div class="range-value">
+                    <span class="range-value-number" id="value_${cat.metrica}">3</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
 
-    if (!isValid) {
-        alert('Por favor, asegúrate de que todas las categorías tengan una puntuación entre 1 y 5.');
-        return false;
+        document.querySelectorAll('.form-range').forEach(range => {
+            const update = () => {
+                const valEl = document.getElementById('value_' + range.id);
+                if (valEl) {
+                    valEl.textContent = range.value;
+                    const pct = ((range.value - range.min) / (range.max - range.min)) * 100;
+                    range.style.setProperty('--thumb-position', pct + '%');
+                }
+                range.dataset.touched = 'true';
+            };
+            range.addEventListener('input', update);
+            range.addEventListener('change', update);
+        });
+
+        document.querySelectorAll('.category-card').forEach((card, i) => {
+            card.style.animationDelay = (i * 0.1) + 's';
+            card.classList.add('fade-in');
+        });
     }
 
-    return true;
-}
+    async function cargarEstadoHoy() {
+        try {
+            const response = await window.CampusCareApi.request(`/api/autoevaluaciones/hoy?usuarioId=${usuario.id}`);
+            if (response) {
+                mostrarResumen(response);
+            } else {
+                form.classList.remove('d-none');
+            }
+        } catch (error) {
+            // Si no hay evaluación hoy (204 o error controlado), mostramos el form
+            form.classList.remove('d-none');
+        }
+    }
+
+    function mostrarResumen(datos) {
+        document.getElementById('fechaEvaluacion').textContent =
+            new Date(datos.fechaEvaluacion).toLocaleDateString('es-CR');
+
+        document.getElementById('resumenScores').innerHTML = CATEGORIAS.map(cat => {
+            const respuesta = datos.respuestas.find(r => r.metrica === cat.metrica);
+            const score = respuesta ? respuesta.score : '-';
+            return `
+                <div class="col-6 col-md-2 mb-3">
+                    <div class="evaluation-summary-item">
+                        <div class="evaluation-icon">${cat.icono}</div>
+                        <small class="text-muted d-block mb-1">${cat.nombre}</small>
+                        <div class="evaluation-score">${score}<span class="text-muted">/5</span></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        resumen.classList.remove('d-none');
+        form.classList.add('d-none');
+    }
+
+
+    document.getElementById('btnCorregir')?.addEventListener('click', () => {
+        resumen.classList.add('d-none');
+        form.classList.remove('d-none');
+    });
+
+   form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        errorBox.classList.add('d-none');
+
+        if (!validarFormulario()) return;
+
+        const payload = {
+            idUsuario: usuario.id,
+            respuestas: CATEGORIAS.map(cat => ({
+                metrica: cat.metrica,
+                score: parseInt(document.getElementById(cat.metrica).value, 10),
+            })),
+        };
+
+        try {
+            const resultado = await window.CampusCareApi.request('/api/autoevaluaciones/guardar-autoevaluacion', {
+                method: 'POST',
+                body: payload,
+            });
+            mostrarResumen(resultado);
+        } catch (error) {
+            errorBox.textContent = error.message || 'Ocurrió un error al guardar la evaluación.';
+            errorBox.classList.remove('d-none');
+        }
+    });
+
+    function validarFormulario() {
+        let isValid = true;
+        document.querySelectorAll('.form-range').forEach(range => {
+            if (range.dataset.touched !== 'true') {
+                isValid = false;
+                range.style.borderColor = '#ff6b6b';
+            } else {
+                range.style.borderColor = '';
+            }
+        });
+
+        if (!isValid) {
+            errorBox.textContent = 'Por favor, ajustá todas las categorías antes de guardar.';
+            errorBox.classList.remove('d-none');
+        }
+
+        return isValid;
+    }
+
+
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        errorBox.classList.add('d-none');
+
+        if (!validarFormulario()) return;
+
+        const payload = {
+            idUsuario: usuario.id,
+            respuestas: CATEGORIAS.map(cat => ({
+                metrica: cat.metrica,
+                score: parseInt(document.getElementById(cat.metrica).value, 10),
+            })),
+        };
+
+        try {
+            const resultado = await window.CampusCareApi.request('/api/autoevaluaciones/guardar-autoevaluacion', {
+                method: 'POST',
+                body: payload,
+            });
+            mostrarResumen(resultado);
+            mostrarModalPuntos(resultado.puntosGanados);
+        } catch (error) {
+            errorBox.textContent = error.message || 'Ocurrió un error al guardar la evaluación.';
+            errorBox.classList.remove('d-none');
+        }
+    });
+
+    function mostrarModalPuntos(puntos) {
+        const modalBody = document.getElementById('modal-felicitacion-body');
+        modalBody.innerHTML = `
+            <p class="lead">¡Has completado tu autoevaluación de hoy!</p>
+            <div class="my-4">
+                <span class="display-4 fw-bolder text-warning">+${puntos}</span>
+                <p class="text-muted mb-0">puntos ganados</p>
+            </div>
+            <p class="h5">¡Seguí así para mantener tu racha! 🔥</p>
+        `;
+        const felicitacionModal = new bootstrap.Modal(document.getElementById('modal-felicitacion'));
+        felicitacionModal.show();
+    }
+
+
+
+});
+
+
+
+
+
+

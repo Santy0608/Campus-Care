@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 email:          form.email.value.trim(),
                 nombre_usuario: form.nombre_usuario.value.trim(),
                 contrasenia:    form.contrasenia.value.trim(),
-                role:           'estudiante'
+                role:           'ESTUDIANTE'
             };
 
             const camposVacios = Object.values(payload).some(v => !v);
@@ -27,29 +27,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            try {
-                /*
-                 * TODO: apuntar a tu endpoint real de registro.
-                 * Debe devolver { ok: true } o { ok: false, mensaje: '...' }.
-                 */
-                const resp = await fetch('/api/registro', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                try {
+                // POST /api/usuarios/agregar-usuario  — requiere ADMIN
+                const resp = await fetch('/api/usuarios/agregar-usuario', {
+                    method:  'POST',
+                    headers: {
+                        'Content-Type':  'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('token') ?? ''}`
+                    },
                     body: JSON.stringify(payload)
                 });
 
-                const data = await resp.json();
-
-                if (data.ok) {
-                    mostrarMensaje(msgArea, 'exito',
+                if (resp.ok) {
+                    mostrarMensaje(msgArea, 'success',
                         'Usuario registrado correctamente. <a href="indexLogin.html">Iniciar sesión</a>');
                     form.reset();
                 } else {
-                    mostrarMensaje(msgArea, 'error', data.mensaje || 'Error al registrar. Intenta de nuevo.');
+                    const err = await resp.json().catch(() => ({}));
+                    mostrarMensaje(msgArea, 'danger', err.mensaje || 'Error al registrar. Intenta de nuevo.');
                 }
+
             } catch (err) {
                 console.error('Error de registro:', err);
-                mostrarMensaje(msgArea, 'error', 'No se pudo conectar con el servidor.');
+                mostrarMensaje(msgArea, 'danger', 'No se pudo conectar con el servidor.');
             }
         });
     }

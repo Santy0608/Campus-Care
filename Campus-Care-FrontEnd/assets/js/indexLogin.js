@@ -6,37 +6,57 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // Si ya hay sesión, redirigir al inicio
-    if (sessionStorage.getItem('usuario') && sessionStorage.getItem('token')) {
-        window.location.href = '/';
+    if (sessionStorage.getItem('usuario')) {
+        window.location.href = '../index.html';
         return;
     }
 
     const form    = document.getElementById('form-login');
     const msgArea = document.getElementById('mensaje-login');
 
-    if (form) {
+if (form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const usuario    = form.nombre_usuario.value.trim();
-            const contrasenia = form.contrasenia.value.trim();
+            const nombreUsuario = form.nombre_usuario.value.trim();
+            const contrasenia   = form.contrasenia.value.trim();
 
-            if (!usuario || !contrasenia) {
-                mostrarError(msgArea, 'Por favor complete todos los campos.');
+            if (!nombreUsuario || !contrasenia) {
+                mostrarMensaje(msgArea, 'danger', 'Por favor complete todos los campos.');
                 return;
             }
 
             try {
-                const data = await window.CampusCareApi.request('/login', {
+                
+                const resp = await fetch('/login', {
                     method: 'POST',
-                    body: { nombreUsuario: usuario, contrasenia }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nombre_usuario: nombreUsuario,
+                        contrasenia:    contrasenia
+                    })
                 });
 
-                window.CampusCareApi.storeAuthSession(data);
-                window.location.href = '/';
+                if (!resp.ok) {
+                    mostrarMensaje(msgArea, 'danger', 'Usuario o contraseña incorrectos.');
+                    return;
+                }
+
+                const data = await resp.json();
+
+                
+                sessionStorage.setItem('token',   data.token);
+                sessionStorage.setItem('usuario', JSON.stringify({
+                    id:     data.id,
+                    nombre: data.nombre,
+                    role:   data.role   //'ESTUDIANTE' o 'ADMIN'
+                }));
+
+                window.location.href = '../index.html';
+
             } catch (err) {
                 console.error('Error de login:', err);
-                mostrarError(msgArea, err.message || 'No se pudo conectar con el servidor. Intenta de nuevo.');
+                mostrarMensaje(msgArea, 'danger', 'No se pudo conectar con el servidor. Intenta de nuevo.');
             }
         });
     }

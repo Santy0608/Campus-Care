@@ -25,36 +25,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-function getUsuarioSesion() {
-    const raw = sessionStorage.getItem('usuario');
-    if (!raw) return null;
-    try { return JSON.parse(raw); } catch { return null; }
-}
 
 /**
  * Obtiene los datos actuales del usuario desde la API y los rellena en el formulario.
  */
 async function cargarDatosUsuario(idUsuario) {
     try {
-        /*
-         * TODO: apuntar a tu endpoint real.
-         * Debe devolver { telefono, email, nombre_usuario }.
-         */
-        const resp = await fetch(`/api/usuarios/${idUsuario}`);
-        const data = await resp.json();
+        const resp = await fetch(`/api/usuarios/${idUsuario}`, {
+            headers: { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
+        });
 
-        if (data) {
-            setVal('telefono',       data.telefono);
-            setVal('email',          data.email);
-            setVal('nombre_usuario', data.nombre_usuario);
-        }
+        if (!resp.ok) throw new Error('No se pudo cargar el perfil.');
+
+        const data = await resp.json();
+        setVal('telefono',       data.telefono);
+        setVal('email',          data.email);
+        setVal('nombre_usuario', data.nombre_usuario);
+
     } catch (err) {
         console.error('Error al cargar perfil:', err);
     }
 }
 
 /**
- * Envía los cambios del perfil a la API.
+ * Envía los cambios del perfil al backend mediante un PUT.
  */
 async function guardarCambios(idUsuario, form, msgArea) {
     const payload = {
@@ -63,29 +57,68 @@ async function guardarCambios(idUsuario, form, msgArea) {
         nombre_usuario: form.nombre_usuario.value.trim()
     };
 
-    try {
-        /*
-         * TODO: apuntar a tu endpoint real de actualización.
-         */
-        const resp = await fetch(`/api/usuarios/${idUsuario}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+   try {
+        const resp = await fetch(`/api/usuarios/actualizar-usuario/${idUsuario}`, {
+            method:  'PUT',
+            headers: {
+                'Content-Type':  'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            },
             body: JSON.stringify(payload)
         });
 
-        const data = await resp.json();
-
-        if (data.ok) {
+        if (resp.ok) {
             mostrarMensaje(msgArea, 'success', 'Perfil actualizado exitosamente.');
         } else {
-            mostrarMensaje(msgArea, 'danger', data.mensaje || 'Error al actualizar perfil.');
+            const err = await resp.json().catch(() => ({}));
+            mostrarMensaje(msgArea, 'danger', err.mensaje || 'Error al actualizar perfil.');
         }
+
     } catch (err) {
         console.error('Error al guardar perfil:', err);
         mostrarMensaje(msgArea, 'danger', 'No se pudo conectar con el servidor.');
     }
 }
 
+/**
+ * Elimina el perfil del usuario mediante un DELETE.
+ */
+function confirmarEliminacion(idUsuario) {
+    const modal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
+    modal.show();
+ 
+    // El botón de confirmación dentro del modal ejecuta el delete
+    document.getElementById('btn-confirmar-eliminar').onclick = async () => {
+        modal.hide();
+        await eliminarUsuario(idUsuario);
+    };
+}
+ 
+async function eliminarUsuario(idUsuario) {
+    const msgArea = document.getElementById('mensaje-perfil');
+ 
+    try {
+        const resp = await fetch(`/api/usuarios/eliminar-usuario/${idUsuario}`, {
+            method:  'DELETE',
+            headers: { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }
+        });
+ 
+        if (resp.ok) {
+            // Limpiar sesión y redirigir al login tras eliminar
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('usuario');
+            window.location.href = 'indexLogin.html';
+        } else {
+            mostrarMensaje(msgArea, 'danger', 'No se pudo eliminar la cuenta. Intenta de nuevo.');
+        }
+ 
+    } catch (err) {
+        console.error('Error al eliminar usuario:', err);
+        mostrarMensaje(msgArea, 'danger', 'No se pudo conectar con el servidor.');
+    }
+}
+
+//Helpers
 function setVal(id, value) {
     const el = document.getElementById(id);
     if (el) el.value = value ?? '';

@@ -100,7 +100,7 @@ async function actualizarLineaApoyo(id, datos) {
 // DELETE /api/líneas-apoyo/eliminar-linea-apoyo/{id} 
 
 async function eliminarLineaApoyo(id) {
-    // ⚠ URL con tilde en "líneas" — así está en el backend según el PDF
+    // URL con tilde en "líneas" — así está en el backend según el PDF
     const resp = await fetch(`/api/líneas-apoyo/eliminar-linea-apoyo/${id}`, {
         method:  'DELETE',
         headers: { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` }

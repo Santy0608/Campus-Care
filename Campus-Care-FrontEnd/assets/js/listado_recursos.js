@@ -1,71 +1,62 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const usuario = window.CampusCareApi.requireRole('admin');
-    if (!usuario) {
-        return;
-    }
+    const api = window.CampusCareApi;
+    if (!api?.requireRole('admin')) return;
 
-    const estado = {
-        recursos: [],
-        filtrados: [],
+    const ui = {
+        tabla: document.getElementById('recursosBody'),
+        mensaje: document.getElementById('recursosMensaje'),
+        formulario: document.getElementById('formBusqueda'),
+        buscar: document.getElementById('campoBuscar'),
+        limpiar: document.getElementById('limpiarBusqueda'),
     };
+    const estado = { recursos: [], termino: '' };
 
-    const cuerpoTabla = document.getElementById('recursosBody');
-    const mensaje = document.getElementById('recursosMensaje');
-    const form = document.getElementById('formBusqueda');
-    const campoBuscar = document.getElementById('campoBuscar');
-    const botonBuscar = document.getElementById('buscarBoton');
-
-    form.addEventListener('submit', (event) => {
+    ui.formulario.addEventListener('submit', (event) => {
         event.preventDefault();
-        aplicarFiltro();
+        estado.termino = ui.buscar.value.trim().toLocaleLowerCase('es');
+        renderizar();
     });
 
-    botonBuscar.addEventListener('click', (event) => {
-        if (botonBuscar.textContent.trim() === 'Reestablecer') {
-            event.preventDefault();
-            campoBuscar.value = '';
-            botonBuscar.textContent = 'Buscar';
-            estado.filtrados = [...estado.recursos];
-            renderRecursos();
-        }
+    ui.buscar.addEventListener('search', () => {
+        if (!ui.buscar.value) limpiarBusqueda();
+    });
+    ui.limpiar.addEventListener('click', limpiarBusqueda);
+    ui.tabla.addEventListener('click', (event) => {
+        const boton = event.target.closest('[data-accion="eliminar"]');
+        if (boton) eliminarRecurso(boton.dataset.id);
     });
 
     async function cargarRecursos() {
+        mostrarEstado('Cargando recursos...');
         try {
-            const recursos = await window.CampusCareApi.request('/api/recursos/listado-recursos');
-            estado.recursos = Array.isArray(recursos) ? recursos : [];
-            estado.filtrados = [...estado.recursos];
-            renderRecursos();
+            const respuesta = await api.request('/api/recursos/listado-recursos');
+            estado.recursos = Array.isArray(respuesta) ? respuesta : [];
+            renderizar();
         } catch (error) {
-            mostrarMensaje(error.message, 'danger');
-            cuerpoTabla.innerHTML = '<tr><td colspan="8" class="text-muted">No se pudieron cargar los recursos.</td></tr>';
+            mostrarMensaje(error.message || 'No se pudieron cargar los recursos.', 'danger');
+            mostrarEstado('No se pudieron cargar los recursos.');
         }
     }
 
-    function aplicarFiltro() {
-        const termino = campoBuscar.value.trim().toLowerCase();
+    function filtrarRecursos() {
+        if (!estado.termino) return estado.recursos;
 
-        if (!termino) {
-            estado.filtrados = [...estado.recursos];
-            botonBuscar.textContent = 'Buscar';
-            renderRecursos();
-            return;
-        }
+        return estado.recursos.filter((recurso) => [
+            recurso.titulo,
+            recurso.contenido,
+            recurso.categoriaNombre,
+            recurso.tipoRecursoNombre,
+            recurso.urlEnlace,
+        ].some((valor) => String(valor ?? '')
+            .toLocaleLowerCase('es')
+            .includes(estado.termino)));
+    }
 
-        botonBuscar.textContent = 'Reestablecer';
-        estado.filtrados = estado.recursos.filter((recurso) => {
-            const texto = [
-                recurso.titulo,
-                recurso.contenido,
-                recurso.categoriaNombre,
-                recurso.tipoRecursoNombre,
-                recurso.urlEnlace,
-            ].join(' ').toLowerCase();
-
-            return texto.includes(termino);
-        });
-
-        renderRecursos();
+    function limpiarBusqueda() {
+        ui.buscar.value = '';
+        estado.termino = '';
+        renderizar();
+        ui.buscar.focus();
     }
 
     async function eliminarRecurso(id) {
@@ -77,72 +68,113 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
+            cancelButtonText: 'Cancelar',
         });
-
-        if (!resultado.isConfirmed) {
-            return;
-        }
+        if (!resultado.isConfirmed) return;
 
         try {
-            await window.CampusCareApi.request(`/api/recursos/eliminar-recurso/${encodeURIComponent(id)}`, {
-                method: 'DELETE'
+            await api.request(`/api/recursos/eliminar-recurso/${encodeURIComponent(id)}`, {
+                method: 'DELETE',
             });
-
-            estado.recursos = estado.recursos.filter((recurso) => recurso.id !== id);
-            estado.filtrados = estado.filtrados.filter((recurso) => recurso.id !== id);
-            renderRecursos();
+            estado.recursos = estado.recursos.filter(
+                (recurso) => String(recurso.id) !== String(id),
+            );
+            renderizar();
             mostrarMensaje('Recurso eliminado correctamente.', 'success');
         } catch (error) {
-            mostrarMensaje(error.message, 'danger');
+            mostrarMensaje(error.message || 'No se pudo eliminar el recurso.', 'danger');
         }
     }
 
     function formatearFecha(fecha) {
-        if (!fecha) {
-            return '';
-        }
-
-        const date = new Date(fecha);
-        if (Number.isNaN(date.getTime())) {
-            return fecha;
-        }
-
-        return date.toLocaleString('es-CR');
+        if (!fecha) return '';
+        const valor = new Date(fecha);
+        return Number.isNaN(valor.getTime()) ? String(fecha) : valor.toLocaleString('es-CR');
     }
 
-    function renderRecursos() {
-        if (!estado.filtrados.length) {
-            cuerpoTabla.innerHTML = '<tr><td colspan="8" class="text-muted">No hay recursos disponibles.</td></tr>';
-            return;
+    function obtenerUrlSegura(url) {
+        if (!url) return null;
+        try {
+            const valor = new URL(url, window.location.origin);
+            return ['http:', 'https:'].includes(valor.protocol) ? valor.href : null;
+        } catch {
+            return null;
+        }
+    }
+
+    function celda(texto = '') {
+        const elemento = document.createElement('td');
+        elemento.textContent = texto ?? '';
+        return elemento;
+    }
+
+    function crearFila(recurso) {
+        const fila = document.createElement('tr');
+        fila.append(
+            celda(recurso.id),
+            celda(recurso.titulo),
+            celda(recurso.tipoRecursoNombre),
+            celda(recurso.categoriaNombre),
+        );
+
+        const celdaUrl = celda('Sin enlace');
+        const url = obtenerUrlSegura(recurso.urlEnlace);
+        if (url) {
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.target = '_blank';
+            enlace.rel = 'noopener noreferrer';
+            enlace.textContent = 'Abrir';
+            celdaUrl.replaceChildren(enlace);
         }
 
-        cuerpoTabla.innerHTML = estado.filtrados.map((recurso) => `
-            <tr>
-                <td>${window.CampusCareApi.escapeHtml(recurso.id || '')}</td>
-                <td>${window.CampusCareApi.escapeHtml(recurso.titulo || '')}</td>
-                <td>${window.CampusCareApi.escapeHtml(recurso.tipoRecursoNombre || '')}</td>
-                <td>${window.CampusCareApi.escapeHtml(recurso.categoriaNombre || '')}</td>
-                <td><a href="${window.CampusCareApi.escapeHtml(recurso.urlEnlace || '#')}" target="_blank" rel="noreferrer">Abrir</a></td>
-                <td>${window.CampusCareApi.escapeHtml(formatearFecha(recurso.fechaPublicacion))}</td>
-                <td>${recurso.activo ? 'Sí' : 'No'}</td>
-                <td>
-                    <a href="actualizar_recurso.html?id_recurso=${encodeURIComponent(recurso.id || '')}"
-                       class="btn btn-warning btn-sm">Actualizar</a>
-                    <button type="button" class="btn btn-danger btn-sm btn-eliminar" data-id="${window.CampusCareApi.escapeHtml(recurso.id || '')}">Eliminar</button>
-                </td>
-            </tr>
-        `).join('');
+        fila.append(
+            celdaUrl,
+            celda(formatearFecha(recurso.fechaPublicacion)),
+            celda(recurso.activo ? 'Sí' : 'No'),
+        );
 
-        document.querySelectorAll('.btn-eliminar').forEach((boton) => {
-            boton.addEventListener('click', () => eliminarRecurso(boton.dataset.id));
-        });
+        const acciones = celda();
+        const actualizar = document.createElement('a');
+        actualizar.href = `actualizar_recurso.html?id_recurso=${encodeURIComponent(recurso.id ?? '')}`;
+        actualizar.className = 'btn btn-warning btn-sm me-1';
+        actualizar.textContent = 'Actualizar';
+
+        const eliminar = document.createElement('button');
+        eliminar.type = 'button';
+        eliminar.className = 'btn btn-danger btn-sm';
+        eliminar.dataset.accion = 'eliminar';
+        eliminar.dataset.id = recurso.id ?? '';
+        eliminar.textContent = 'Eliminar';
+        acciones.append(actualizar, eliminar);
+        fila.append(acciones);
+        return fila;
+    }
+
+    function renderizar() {
+        const recursos = filtrarRecursos();
+        ui.limpiar.classList.toggle('d-none', !estado.termino);
+        if (!recursos.length) {
+            mostrarEstado(estado.termino
+                ? 'No se encontraron recursos.'
+                : 'No hay recursos disponibles.');
+            return;
+        }
+        ui.tabla.replaceChildren(...recursos.map(crearFila));
+    }
+
+    function mostrarEstado(texto) {
+        const fila = document.createElement('tr');
+        const contenido = celda(texto);
+        contenido.colSpan = 8;
+        contenido.className = 'text-center text-muted';
+        fila.append(contenido);
+        ui.tabla.replaceChildren(fila);
     }
 
     function mostrarMensaje(texto, tipo) {
-        mensaje.className = `alert alert-${tipo} mt-3`;
-        mensaje.textContent = texto;
-        mensaje.classList.remove('d-none');
+        ui.mensaje.className = `alert alert-${tipo} mt-3`;
+        ui.mensaje.textContent = texto;
     }
 
     cargarRecursos();

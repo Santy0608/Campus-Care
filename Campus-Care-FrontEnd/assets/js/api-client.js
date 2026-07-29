@@ -168,12 +168,12 @@
         const user = getStoredUser();
 
         if (!user) {
-            window.location.href = '/includes/no_autorizado.php';
+            window.location.href = '/includes/no_autorizado.html';
             return null;
         }
 
         if (expectedRole && user.role !== expectedRole) {
-            window.location.href = '/includes/no_autorizado.php';
+            window.location.href = '/includes/no_autorizado.html';
             return null;
         }
 

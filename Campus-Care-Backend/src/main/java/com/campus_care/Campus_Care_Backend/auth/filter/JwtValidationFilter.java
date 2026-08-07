@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.campus_care.Campus_Care_Backend.auth.SimpleGrantedAuthorityJsonCreator;
+import com.campus_care.Campus_Care_Backend.serviceImpl.CustomUserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -47,15 +48,17 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
         try {
             Claims claims = Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
             String username = claims.getSubject();
-            // String username2 = (String) claims.get("username");
+            String id = claims.get("id", String.class);
             Object authoritiesClaims = claims.get("authorities");
 
             Collection<? extends GrantedAuthority> roles = Arrays.asList(new ObjectMapper()
                     .addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityJsonCreator.class)
                     .readValue(authoritiesClaims.toString().getBytes(), SimpleGrantedAuthority[].class));
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null,
-                    roles);
+            CustomUserDetails principal = new CustomUserDetails(id, username, "", roles);
+
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(principal, null, roles);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             chain.doFilter(request, response);
 

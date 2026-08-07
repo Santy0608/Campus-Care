@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Document(collection = "diarios")
@@ -14,7 +15,8 @@ public class Diario {
     @Field("id_usuario")
     private String idUsuario;
 
-    private LocalDateTime fecha;
+    @Field("fecha")
+    private Instant fecha;
 
     @Field("entrada_texto")
     private String entradaTexto;
@@ -35,11 +37,11 @@ public class Diario {
         this.idUsuario = idUsuario;
     }
 
-    public LocalDateTime getFecha(){
+    public Instant getFecha(){
         return fecha;
     }
 
-    public void setFecha(LocalDateTime fecha){
+    public void setFecha(Instant fecha){
         this.fecha = fecha;
     }
 

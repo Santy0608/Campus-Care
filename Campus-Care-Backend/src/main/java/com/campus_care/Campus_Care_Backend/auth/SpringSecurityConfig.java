@@ -44,6 +44,8 @@ public class SpringSecurityConfig {
 
         return http.authorizeHttpRequests(authz -> authz
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/usuarios/registrar-usuario").permitAll()
+
 
                         //Reglas para Usuarios
                         .requestMatchers(HttpMethod.GET, "/api/usuarios/listado-usuarios").permitAll()
@@ -66,8 +68,10 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.PUT,"/api/catalogos-logros/actualizar-cactalogo-logro/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/catalogos-logros/eliminar-catalogo-logro/{id}").hasRole("ADMIN")
                         //Reglas para Diario
-                        .requestMatchers(HttpMethod.GET,"/api/diarios/listado-diarios").hasRole("ESTUDIANTE")
+                        .requestMatchers(HttpMethod.GET,"/api/diarios/listado-diarios").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/diarios/mis-diarios").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/diarios/agregar-diario").hasRole("ESTUDIANTE")
+                        .requestMatchers(HttpMethod.GET,"/api/diarios/{id}").hasRole("ESTUDIANTE")
                         //Reglas para Ejercicios Practicos
                         .requestMatchers(HttpMethod.GET,"/api/ejercicios-practicos/listado-ejercicios-practicos").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/ejercicios-practicos/{id}").hasAnyRole("ESTUDIANTE","ADMIN")
@@ -100,7 +104,8 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.DELETE,"/api/tipos-recurso/eliminar-tipos-recurso/{id}").hasRole("ADMIN")
                         //Reglas para Dashboard
                         .requestMatchers(HttpMethod.GET,"/api/dashboard/estudiante/{idUsuario}").hasRole("ESTUDIANTE")
-
+                        //Reglas para Dashboard Admin
+                        .requestMatchers(HttpMethod.GET,"/api/dashboard-admin").hasRole("ADMIN")
 
                         .anyRequest().authenticated())
                 .cors(cors -> cors.configurationSource(configurationSource()))

@@ -14,11 +14,21 @@ public class UsuarioDTO {
     private String nombreUsuario;
     private String contrasenia;
 
+    private String telefono;
+
     private List<String> roles;
 
     private int puntosTotales;
 
     private boolean admin;
+
+    public String getTelefono(){
+        return telefono;
+    }
+
+    public void setTelefono(String telefono){
+        this.telefono = telefono;
+    }
 
     public boolean isAdmin() {
         return admin;

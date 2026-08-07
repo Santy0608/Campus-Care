@@ -10,9 +10,12 @@ public interface DiarioService {
 
     List<DiarioDTO> listadoDiarios();
 
+    List<DiarioDTO> listadoDiarioPorUsuario(String idUsuario);
+
     Optional<DiarioDTO> buscarDiarioPorId(String id);
 
     DiarioDTO agregarDiario(DiarioDTO diarioDTO);
+
 
 
 }

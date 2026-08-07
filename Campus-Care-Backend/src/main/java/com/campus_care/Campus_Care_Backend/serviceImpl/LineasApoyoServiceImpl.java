@@ -44,14 +44,13 @@ public class LineasApoyoServiceImpl implements LineasApoyoService {
         lineasApoyo.setUrlSitio(lineasApoyoDTO.getUrlSitio());
         lineasApoyo.setActivo(lineasApoyoDTO.isActivo());
         LineasApoyo lineasApoyoAgregado = lineasApoyoRepository.save(lineasApoyo);
-        return convertirADTO(lineasApoyo);
+        return convertirADTO(lineasApoyoAgregado);
     }
 
     @Override
     public LineasApoyoDTO actualizarLineaApoyo(LineasApoyoDTO lineasApoyoDTO, String id) {
         return lineasApoyoRepository.findById(id)
                 .map(lineasApoyo -> {
-                    lineasApoyo.setId(lineasApoyoDTO.getId());
                     lineasApoyo.setNombreInstitucion(lineasApoyoDTO.getNombreInstitucion());
                     lineasApoyo.setTelefono(lineasApoyoDTO.getTelefono());
                     lineasApoyo.setHorarioAtencion(lineasApoyoDTO.getHorarioAtencion());
@@ -65,7 +64,7 @@ public class LineasApoyoServiceImpl implements LineasApoyoService {
 
     @Override
     public void eliminarPorId(String id) {
-        lineasApoyoRepository.findById(id);
+        lineasApoyoRepository.deleteById(id);
     }
 
     LineasApoyoDTO convertirADTO(LineasApoyo lineasApoyo){

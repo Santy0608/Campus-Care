@@ -1,7 +1,9 @@
 package com.campus_care.Campus_Care_Backend.repository;
 
 import com.campus_care.Campus_Care_Backend.domain.Autoevaluacion;
+import com.campus_care.Campus_Care_Backend.projection.MetricaPromedioAgg;
 import org.springframework.data.mongodb.core.MongoAdminOperations;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
@@ -22,6 +24,14 @@ public interface AutoevaluacionRepository extends MongoRepository<Autoevaluacion
             String idUsuario
     );
 
-    Optional<Autoevaluacion> findByUsuarioIdAndFechaBetween(String usuarioId, Instant inicio, Instant fin);
+//    Optional<Autoevaluacion> findByUsuarioIdAndFechaBetween(String usuarioId, Instant inicio, Instant fin);
+
+    long countByFechaEvaluacionBetween(Instant inicio, Instant fin);
+
+    @Aggregation(pipeline = {
+            "{ '$unwind': '$respuestas' }",
+            "{ '$group': { '_id': '$respuestas.metrica', 'promedio': { '$avg': '$respuestas.score' } } }"
+    })
+    List<MetricaPromedioAgg> promedioPorMetrica();
 
 }

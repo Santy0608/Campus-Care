@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
 
@@ -35,6 +35,11 @@ public class UsuarioController {
 
     @PostMapping("/agregar-usuario")
     public ResponseEntity<?> agregarUsuario(@RequestBody UsuarioDTO usuarioDTO){
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.guardarUsuario(usuarioDTO));
+    }
+
+    @PostMapping("/registrar-usuario")
+    public ResponseEntity<?> registrarUsuario(@RequestBody UsuarioDTO usuarioDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.guardarUsuario(usuarioDTO));
     }
 

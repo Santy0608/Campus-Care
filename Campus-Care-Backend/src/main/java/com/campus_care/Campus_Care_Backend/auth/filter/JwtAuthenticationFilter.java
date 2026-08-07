@@ -1,6 +1,7 @@
 package com.campus_care.Campus_Care_Backend.auth.filter;
 
 import com.campus_care.Campus_Care_Backend.domain.Usuario;
+import com.campus_care.Campus_Care_Backend.serviceImpl.CustomUserDetails;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,11 +65,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authResult
                 .getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
         String username = user.getUsername();
+        String id = userDetails.getId();
+
         Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
         boolean isAdmin = roles.stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
         Claims claims = Jwts
                 .claims()
+                .add("id", id)
                 .add("authorities", new ObjectMapper().writeValueAsString(roles))
                 .add("username", username)
                 .add("isAdmin", isAdmin)

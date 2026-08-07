@@ -29,10 +29,10 @@ public class MongUserDetailsService implements UserDetailsService {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        return new org.springframework.security.core.userdetails.User(
+        return new CustomUserDetails(
+                usuario.getId(),
                 usuario.getNombreUsuario(),
                 usuario.getContrasenia(),
-                true, true, true, true,
                 authorities
         );
     }

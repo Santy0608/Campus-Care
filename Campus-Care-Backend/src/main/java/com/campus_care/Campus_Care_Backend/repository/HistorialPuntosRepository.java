@@ -18,7 +18,7 @@ public interface HistorialPuntosRepository extends MongoRepository<HistorialPunt
     // Opción con agregación: Mongo hace la suma, más eficiente
     @Aggregation(pipeline = {
             "{ '$match': { 'idUsuario': ?0 } }",
-            "{ '$group': { '_id': null, 'total': { '$sum': '$puntosGanados' } } }"
+            "{ '$group': { '_id': null, 'total': { '$sum': '$puntos_ganados' } } }"
     })
     AggregationResults<TotalPuntos> sumarPuntosPorUsuario(String idUsuario);
 

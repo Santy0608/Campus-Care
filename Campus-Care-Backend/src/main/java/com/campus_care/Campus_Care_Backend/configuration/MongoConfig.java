@@ -20,12 +20,6 @@ import java.util.*;
 public class MongoConfig {
 
     @Bean
-    public MongoDatabaseFactory mongoDatabaseFactory() {
-        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-        return new SimpleMongoClientDatabaseFactory(mongoClient, "CampusCare");
-    }
-
-    @Bean
     public MongoCustomConversions mongoCustomConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
         converters.add(DateToLocalDateTimeConverter.INSTANCE);

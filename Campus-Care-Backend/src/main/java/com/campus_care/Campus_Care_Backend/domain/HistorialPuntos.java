@@ -22,6 +22,10 @@ public class HistorialPuntos {
         return id;
     }
 
+    public String getIdUsuario(){
+        return idUsuario;
+    }
+
     public void setIdUsuario(String idUsuario){
         this.idUsuario = idUsuario;
     }

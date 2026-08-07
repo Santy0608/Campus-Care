@@ -49,7 +49,6 @@ public class FraseMotivacionalServiceImpl implements FrasesMotivacionalesService
     public FrasesMotivacionalesDTO actualizarFraseMotivacional(FrasesMotivacionalesDTO frasesMotivacionalesDTO, String id) {
         return frasesMotivacionalesRepository.findById(id)
                 .map(frasesMotivacionales -> {
-                    frasesMotivacionales.setId(frasesMotivacionalesDTO.getId());
                     frasesMotivacionales.setTexto(frasesMotivacionalesDTO.getTexto());
                     frasesMotivacionales.setAutor(frasesMotivacionalesDTO.getAutor());
                     frasesMotivacionales.setActivo(true);

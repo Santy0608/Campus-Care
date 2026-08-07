@@ -100,32 +100,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         form.classList.remove('d-none');
     });
 
-   form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        errorBox.classList.add('d-none');
-
-        if (!validarFormulario()) return;
-
-        const payload = {
-            idUsuario: usuario.id,
-            respuestas: CATEGORIAS.map(cat => ({
-                metrica: cat.metrica,
-                score: parseInt(document.getElementById(cat.metrica).value, 10),
-            })),
-        };
-
-        try {
-            const resultado = await window.CampusCareApi.request('/api/autoevaluaciones/guardar-autoevaluacion', {
-                method: 'POST',
-                body: payload,
-            });
-            mostrarResumen(resultado);
-        } catch (error) {
-            errorBox.textContent = error.message || 'Ocurrió un error al guardar la evaluación.';
-            errorBox.classList.remove('d-none');
-        }
-    });
-
     function validarFormulario() {
         let isValid = true;
         document.querySelectorAll('.form-range').forEach(range => {
@@ -145,8 +119,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         return isValid;
     }
 
-
-
+    // FIX: antes había DOS listeners de submit casi idénticos registrados con
+    // addEventListener — no se reemplazan entre sí, se ACUMULAN. Cada submit
+    // disparaba dos POST a /api/autoevaluaciones/guardar-autoevaluacion,
+    // pudiendo crear dos documentos de autoevaluación el mismo día para el
+    // mismo usuario (condición de carrera contra el chequeo yaEvaluoHoy del
+    // backend) y duplicar los puntos otorgados. Se dejó un solo listener.
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         errorBox.classList.add('d-none');
@@ -188,12 +166,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         felicitacionModal.show();
     }
 
-
-
 });
-
-
-
-
-
-

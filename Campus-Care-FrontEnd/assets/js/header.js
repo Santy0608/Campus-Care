@@ -45,7 +45,8 @@ function renderNavbar(usuario) {
                 <a class="nav-link" href="/modules/resources_student/recursos_estudiantes.html" title="Recursos de bienestar">
                     <i class="fas fa-seedling me-1"></i>Mis Recursos
                 </a>
-            </li>`;
+            </li>`
+            ;
     } else if (usuario && usuario.role === 'admin') {
         roleLinks = `
             <li class="nav-item dropdown">
@@ -73,7 +74,7 @@ function renderNavbar(usuario) {
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" title="Gestionar frases">
-                    <i class="fas fa-quote-right me-1"></i>Frases (Admin)
+                    <i class="fas fa-quote-right me-1"></i>Frases y Líneas (Admin)
                 </a>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="/modules/alerts/listado_frases.html">
@@ -82,13 +83,21 @@ function renderNavbar(usuario) {
                     <li><a class="dropdown-item" href="/modules/alerts/agregar_frase.html">
                         <i class="fas fa-plus me-2"></i>Agregar nueva frase
                     </a></li>
+                    <li><a class="dropdown-item" href="/modules/lineas_apoyo/lineas_apoyo.html">
+                        <i class="fas fa-list me-2"></i>Ver todas las lineas de apoyo
+                    </a></li>
+                    <li><a class="dropdown-item" href="/modules/alerts/agregar_linea_apoyo.html">
+                        <i class="fas fa-plus me-2"></i>Agregar nueva línea apoyo
+                    </a></li>
                 </ul>
+                
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/modules/dashboard_admin/dashboard_admin.html" title="Dashboard">
                     <i class="fas fa-chart-line me-1"></i>Dashboard
                 </a>
-            </li>`;
+
+            `;
     }
 
     // ------ Link de sesión (saludo / login) ------
@@ -108,14 +117,14 @@ function renderNavbar(usuario) {
                 </ul>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#" id="btn-logout" title="Cerrar sesión">
+                <a class="nav-link" href="/login/indexLogin.html" id="btn-logout" title="Cerrar sesión">
                     <i class="fas fa-sign-out-alt me-1"></i>Cerrar sesión
                 </a>
             </li>`;
     } else {
         sessionLink = `
             <li class="nav-item">
-                <a class="nav-link" href="/" title="Acceder a tu cuenta">
+                <a class="nav-link" href="/login/indexLogin.html" title="Acceder a tu cuenta">
                     <i class="fas fa-sign-in-alt me-1"></i>Iniciar Sesión
                 </a>
             </li>`;
@@ -125,7 +134,7 @@ function renderNavbar(usuario) {
     nav.innerHTML = `
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-leaf me-2"></i>Bienestar Estudiantil
+                <i class="fas fa-leaf me-2"></i>Campus Care 
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
@@ -165,7 +174,7 @@ function cerrarSesion() {
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('usuario');
     }
-    window.location.href = '/';
+    window.location.href = '/login/indexLogin.html';
 }
 
 /**

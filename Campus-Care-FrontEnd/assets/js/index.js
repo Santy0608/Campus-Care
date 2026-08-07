@@ -3,6 +3,12 @@
  * Lógica de la página principal:
  *  - Modal de estado de ánimo (con throttle de 24 h vía localStorage)
  *  - Modal de recordatorio de autoevaluación (solo para estudiantes)
+ *  - Frase del día (vía API)
+ *
+ * NOTA: el auth check ya NO se hace con una función propia leyendo
+ * sessionStorage a mano. Se usa window.CampusCareApi.getStoredUser(),
+ * la misma fuente de verdad que usan las páginas de admin (api-client.js),
+ * para evitar tener dos implementaciones del mismo concepto.
  */
 
 // Diccionario de frases motivacionales por estado de ánimo
@@ -28,6 +34,7 @@ const frasesMotivacionales = {
 document.addEventListener('DOMContentLoaded', () => {
     initMoodModal();
     initAutoevaluacionModal();
+    cargarFraseDelDia();
 });
 
 // ─── Modal de Estado de Ánimo ────────────────────────────────────────────────
@@ -45,8 +52,8 @@ function initMoodModal() {
     const LAST_SHOWN_KEY = 'last_shown_mood_modal';
     const ONE_DAY_MS     = 24 * 60 * 60 * 1000;
 
-    const now        = Date.now();
-    const lastShown  = localStorage.getItem(LAST_SHOWN_KEY);
+    const now       = Date.now();
+    const lastShown = localStorage.getItem(LAST_SHOWN_KEY);
 
     if (!lastShown || (now - Number(lastShown)) > ONE_DAY_MS) {
         const modal = new bootstrap.Modal(modalElement);
@@ -62,13 +69,14 @@ function initMoodModal() {
 
             const mood = e.currentTarget.getAttribute('data-mood');
             const data = frasesMotivacionales[mood];
+            if (!data) return; // guard: data-mood desconocido
 
             phraseTitle.textContent = data.titulo;
             phraseText.textContent  = data.texto;
 
             moodSelection.style.opacity = '0';
             setTimeout(() => {
-                moodSelection.style.display  = 'none';
+                moodSelection.style.display    = 'none';
                 motivationPhrase.style.opacity = '0';
                 motivationPhrase.style.display = 'block';
                 setTimeout(() => { motivationPhrase.style.opacity = '1'; }, 50);
@@ -90,11 +98,12 @@ function initAutoevaluacionModal() {
     const modalElement = document.getElementById('modalAutoevaluacion');
     if (!modalElement) return;
 
-    // Solo mostrar si el usuario es estudiante
-    const usuario = getUsuarioSesion();
+    // Fuente única de verdad para el usuario logueado: la misma que usan
+    // las páginas de admin. Si no existe CampusCareApi cargado en esta
+    // página, tratamos al usuario como no logueado en vez de romper.
+    const usuario = window.CampusCareApi?.getStoredUser?.();
     if (!usuario || usuario.role !== 'estudiante') return;
 
-    // Verificar flag de notificación (reemplaza la lógica de $mostrarNotificacion PHP)
     const mostrarNotificacion = obtenerFlagNotificacion();
     if (!mostrarNotificacion) return;
 
@@ -113,28 +122,40 @@ function initAutoevaluacionModal() {
 
 /**
  * Determina si se debe mostrar la notificación de autoevaluación.
- * En la versión PHP esto venía del servidor; aquí se puede obtener
- * vía API o dejarlo en true para mostrar siempre (comportamiento por defecto).
+ * TODO: reemplazar con llamada real cuando exista el endpoint, ej:
+ *   const data = await window.CampusCareApi.request('/api/notificacion-autoevaluacion');
+ *   return data.mostrar;
  * @returns {boolean}
  */
 function obtenerFlagNotificacion() {
-    // TODO: reemplazar con llamada a API real, por ejemplo:
-    // const resp = await fetch('/api/notificacion-autoevaluacion');
-    // const data = await resp.json();
-    // return data.mostrar;
     return true;
 }
 
+// ─── Frase del Día ────────────────────────────────────────────────────────────
+
 /**
- * Recupera el usuario de la sesión almacenada en el navegador.
- * @returns {object|null}
+ * Carga la frase motivacional del día desde el backend y la pinta en
+ * el <blockquote id="frase-dia">. Si falla o el endpoint todavía no
+ * existe, deja un mensaje claro en vez de "Cargando..." infinito.
+ *
+ * TODO: confirmar la ruta real del endpoint con el backend. Se asume
+ * algo como GET /api/frases-motivacionales/aleatoria que devuelve
+ * { texto, autor }. Ajustar cuando esté confirmado.
  */
-function getUsuarioSesion() {
-    const raw = sessionStorage.getItem('usuario');
-    if (!raw) return null;
+async function cargarFraseDelDia() {
+    const el = document.getElementById('frase-dia');
+    if (!el) return;
+
+    if (!window.CampusCareApi?.request) {
+        el.textContent = 'No se pudo cargar la frase del día.';
+        return;
+    }
+
     try {
-        return JSON.parse(raw);
-    } catch {
-        return null;
+        // TODO: confirmar ruta real del endpoint
+        const frase = await window.CampusCareApi.request('/api/frases-motivacionales/aleatoria');
+        el.textContent = frase.autor ? `"${frase.texto}" — ${frase.autor}` : frase.texto;
+    } catch (error) {
+        el.textContent = 'No se pudo cargar la frase del día.';
     }
 }

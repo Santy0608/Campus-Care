@@ -3,7 +3,7 @@ const METRICAS_INFO = {
     ANSIEDAD: { label: 'Ansiedad', icon: '😟', color: 'warning' },
     SUENO: { label: 'Sueño', icon: '😴', color: 'info' },
     ANIMO: { label: 'Ánimo', icon: '😊', color: 'success' },
-    RELACIONES: { label: 'Relaciones', icon: '💔', color: 'secondary' },
+    RELACIONES: { label: 'Relaciones', icon: '💕', color: 'secondary' },
     MOTIVACION: { label: 'Motivación', icon: '💪', color: 'primary' },
 };
 

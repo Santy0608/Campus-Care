@@ -1,6 +1,16 @@
 /**
  * registro.js
  * Maneja el formulario de registro de nuevos usuarios.
+ *
+ * FIX: antes usaba fetch('/api/usuarios/registrar-usuario', ...) con ruta
+ * relativa — apuntaba al puerto de Live Server (5500), no al de Spring
+ * Boot (8080). Ahora usa CampusCareApi.request(), que resuelve la URL
+ * base correcta.
+ *
+ * FIX: CampusCareApi.request() solo agrega el header Authorization si
+ * hay un token guardado — un usuario nuevo sin sesión nunca manda un
+ * header "Bearer " vacío que tumbe la request contra el
+ * JwtValidationFilter del backend.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 apellido:       form.apellido.value.trim(),
                 telefono:       form.telefono.value.trim(),
                 email:          form.email.value.trim(),
-                nombre_usuario: form.nombre_usuario.value.trim(),
+                nombreUsuario: form.nombreUsuario.value.trim(),
                 contrasenia:    form.contrasenia.value.trim(),
                 role:           'ESTUDIANTE'
             };
@@ -27,29 +37,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-                try {
-                // POST /api/usuarios/agregar-usuario  — requiere ADMIN
-                const resp = await fetch('/api/usuarios/agregar-usuario', {
-                    method:  'POST',
-                    headers: {
-                        'Content-Type':  'application/json',
-                        'Authorization': `Bearer ${sessionStorage.getItem('token') ?? ''}`
-                    },
-                    body: JSON.stringify(payload)
+            try {
+                // POST /api/usuarios/registrar-usuario — pública (permitAll)
+                await window.CampusCareApi.request('/api/usuarios/registrar-usuario', {
+                    method: 'POST',
+                    body: payload,
                 });
 
-                if (resp.ok) {
-                    mostrarMensaje(msgArea, 'success',
-                        'Usuario registrado correctamente. <a href="indexLogin.html">Iniciar sesión</a>');
-                    form.reset();
-                } else {
-                    const err = await resp.json().catch(() => ({}));
-                    mostrarMensaje(msgArea, 'danger', err.mensaje || 'Error al registrar. Intenta de nuevo.');
-                }
+                mostrarMensaje(msgArea, 'exito',
+                    'Usuario registrado correctamente. <a href="indexLogin.html">Iniciar sesión</a>');
+                form.reset();
 
             } catch (err) {
                 console.error('Error de registro:', err);
-                mostrarMensaje(msgArea, 'danger', 'No se pudo conectar con el servidor.');
+                mostrarMensaje(msgArea, 'error', err.message || 'Error al registrar. Intenta de nuevo.');
             }
         });
     }

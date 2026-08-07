@@ -11,40 +11,69 @@ document.addEventListener('DOMContentLoaded', async () => {
     const usuario = window.CampusCareApi.requireRole('admin');
     if (!usuario) return;
 
-    await cargarTotalEstudiantes();
-    mostrarRadarNoDisponible();
+    await cargarDashboardAdmin();
 });
 
-async function cargarTotalEstudiantes() {
-    const totalEl = document.getElementById('totalEstudiantes');
-
+async function cargarDashboardAdmin() {
     try {
-        const usuarios = await window.CampusCareApi.request('/api/usuarios/listado-usuarios');
-        const totalEstudiantes = (Array.isArray(usuarios) ? usuarios : [])
-            .filter((u) => !u.admin && !(u.roles || []).includes('ADMIN'))
-            .length;
+        const data = await window.CampusCareApi.request('/api/dashboard-admin');
 
-        totalEl.textContent = totalEstudiantes;
+        document.getElementById('totalEstudiantes').textContent = data.totalEstudiantes;
+        document.getElementById('evaluacionesHoy').textContent = data.evaluacionesHoy;
+        document.getElementById('riesgoPromedio').textContent = data.riesgoPromedio;
+        document.getElementById('riesgoCategoria').textContent = `Categoría: ${data.riesgoCategoria}`;
+
+        renderRadar(data);
     } catch (error) {
-        console.error('Error cargando el listado de usuarios:', error);
-        totalEl.textContent = '-';
+        console.error('Error cargando el dashboard admin:', error);
+        mostrarErrorDashboard();
     }
 }
 
-// El backend aún no expone un endpoint agregado de autoevaluaciones para el
-// rol ADMIN (ver documentación de endpoints: solo existe
-// /api/dashboard/estudiante/{idUsuario}, restringido a ESTUDIANTE).
-// Se muestra el estado vacío en lugar de inventar una llamada a una ruta
-// inexistente.
-function mostrarRadarNoDisponible() {
-    document.getElementById('evaluacionesHoy').textContent = 'N/D';
-    document.getElementById('riesgoPromedio').textContent = 'N/D';
-    document.getElementById('riesgoCategoria').textContent = 'Categoría: N/A';
+function renderRadar(data) {
+    const valores = CATEGORIAS_BIENESTAR.map((cat) => data[cat.key] || 0);
+    const hayDatos = valores.some((v) => v > 0);
 
+    if (!hayDatos) {
+        mostrarErrorDashboard('Aún no hay suficientes evaluaciones para mostrar el gráfico poblacional.');
+        return;
+    }
+
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: CATEGORIAS_BIENESTAR.map((cat) => cat.label),
+            datasets: [{
+                label: 'Promedio general',
+                data: valores,
+                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                borderColor: 'rgba(0, 123, 255, 1)',
+                pointBackgroundColor: CATEGORIAS_BIENESTAR.map((cat) => cat.color),
+            }],
+        },
+        options: {
+            responsive: true,
+            aspectRatio: 1,
+            plugins: { legend: { display: false } },
+            scales: {
+                r: {
+                    angleLines: { display: true, color: 'rgba(0, 0, 0, 0.1)' },
+                    suggestedMin: 0,
+                    suggestedMax: 5,
+                    ticks: { stepSize: 1, color: 'rgba(0, 0, 0, 0.6)' },
+                    pointLabels: { font: { size: 14, weight: 'bold' } },
+                },
+            },
+        },
+    });
+}
+
+function mostrarErrorDashboard(mensaje) {
     const container = document.getElementById('radarChart').parentElement.parentElement;
     container.innerHTML = `
         <div class="alert alert-info text-center mt-3" role="alert">
             <i class="fas fa-info-circle me-2"></i>
-            El backend todavía no expone un endpoint de métricas agregadas para el panel administrativo.
+            ${window.CampusCareApi.escapeHtml(mensaje || 'No se pudo cargar el dashboard.')}
         </div>`;
 }

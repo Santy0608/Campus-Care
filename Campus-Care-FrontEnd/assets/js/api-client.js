@@ -83,6 +83,7 @@
         });
 
         return {
+            id: payload.id,
             username,
             nombre: username,
             role: isAdmin ? 'admin' : 'estudiante',

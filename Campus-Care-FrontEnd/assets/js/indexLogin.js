@@ -2,19 +2,33 @@
  * indexLogin.js
  * Maneja el formulario de inicio de sesión.
  * Si ya hay sesión activa, redirige al inicio.
+ *
+ * FIX: antes usaba fetch('/login', ...) con ruta relativa — apuntaba al
+ * puerto de Live Server (5500), no al de Spring Boot (8080). Ahora usa
+ * CampusCareApi.request(), que ya resuelve la URL base correcta.
+ *
+ * FIX: antes leía data.id, data.nombre, data.role de la respuesta del
+ * login — pero el backend (JwtAuthenticationFilter) solo devuelve
+ * { token, username, message }. data.role nunca existió, quedaba
+ * undefined en silencio. CampusCareApi.storeAuthSession() decodifica el
+ * rol directamente del JWT, que es donde realmente vive.
+ *
+ * FIX: la función mostrarMensaje() se llamaba pero nunca se definía en
+ * este archivo (solo existía mostrarError, con otra firma). Se agregó
+ * la definición correcta.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     // Si ya hay sesión, redirigir al inicio
-    if (sessionStorage.getItem('usuario')) {
-        window.location.href = '../index.html';
+    if (window.CampusCareApi.getStoredUser()) {
+        window.location.href = '/index.html';
         return;
     }
 
     const form    = document.getElementById('form-login');
     const msgArea = document.getElementById('mensaje-login');
 
-if (form) {
+    if (form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -22,53 +36,37 @@ if (form) {
             const contrasenia   = form.contrasenia.value.trim();
 
             if (!nombreUsuario || !contrasenia) {
-                mostrarMensaje(msgArea, 'danger', 'Por favor complete todos los campos.');
+                mostrarMensaje(msgArea, 'error', 'Por favor complete todos los campos.');
                 return;
             }
 
             try {
-                
-                const resp = await fetch('/login', {
+                const authResponse = await window.CampusCareApi.request('/login', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        nombre_usuario: nombreUsuario,
-                        contrasenia:    contrasenia
-                    })
+                    body: {
+                        nombreUsuario: nombreUsuario,
+                        contrasenia:    contrasenia,
+                    },
                 });
 
-                if (!resp.ok) {
-                    mostrarMensaje(msgArea, 'danger', 'Usuario o contraseña incorrectos.');
-                    return;
-                }
-
-                const data = await resp.json();
-
-                
-                sessionStorage.setItem('token',   data.token);
-                sessionStorage.setItem('usuario', JSON.stringify({
-                    id:     data.id,
-                    nombre: data.nombre,
-                    role:   data.role   //'ESTUDIANTE' o 'ADMIN'
-                }));
-
-                window.location.href = '../index.html';
+                window.CampusCareApi.storeAuthSession(authResponse);
+                window.location.href = '/includes/index.html';
 
             } catch (err) {
                 console.error('Error de login:', err);
-                mostrarMensaje(msgArea, 'danger', 'No se pudo conectar con el servidor. Intenta de nuevo.');
+
+                if (err.status === 401 || err.status === 403) {
+                    mostrarMensaje(msgArea, 'error', 'Usuario o contraseña incorrectos.');
+                } else {
+                    mostrarMensaje(msgArea, 'error', 'No se pudo conectar con el servidor. Intenta de nuevo.');
+                }
             }
         });
     }
 });
 
-function mostrarError(container, texto) {
+function mostrarMensaje(container, tipo, texto) {
     if (!container) return;
-    container.innerHTML = `<p class="mensaje-error">${escapeHtml(texto)}</p>`;
-}
-
-function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.appendChild(document.createTextNode(str));
-    return div.innerHTML;
+    const clase = tipo === 'exito' ? 'mensaje-exito' : 'mensaje-error';
+    container.innerHTML = `<p class="${clase}">${window.CampusCareApi.escapeHtml(texto)}</p>`;
 }

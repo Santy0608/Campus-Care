@@ -5,10 +5,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const contenedor = document.getElementById('listaEntradas');
 
     try {
-        const diarios = await window.CampusCareApi.request('/api/diarios/listado-diarios');
-        const entradas = (Array.isArray(diarios) ? diarios : [])
-            .filter((entrada) => String(entrada.idUsuario) === String(usuario.id))
-            .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        const entradas = await window.CampusCareApi.request('/api/diarios/mis-diarios');
+        entradas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
         renderizar(entradas);
     } catch (error) {

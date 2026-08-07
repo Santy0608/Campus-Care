@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Líneas de Apoyo (Admin) | Campus Care</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/estilos.css">
+    <link rel="stylesheet" href="/assets/css/header.css">
+
+    <script src="/assets/js/api-client.js" defer></script>
+    <script src="/assets/js/header.js" defer></script>
+    <script src="/assets/js/layout-loader.js" defer></script>
+    <script src="/assets/js/lineas_apoyo.js" defer></script>
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <div class="container mt-5">
+        <div class="text-center mb-4">
+            <h1><i class="fas fa-hands-helping me-2"></i>Listado de Líneas de Apoyo</h1>
+        </div>
+
+        <div id="lineaApoyoMensaje" class="alert d-none" role="alert"></div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <a href="agregar_linea_apoyo.html" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Agregar Línea de Apoyo
+            </a>
+
+            <form id="formBusqueda" class="d-flex gap-2">
+                <input type="text" id="campoBuscar" class="form-control" placeholder="Buscar por institución o teléfono...">
+                <button type="submit" id="buscarBoton" class="btn btn-outline-primary">Buscar</button>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Institución</th>
+                        <th>Teléfono</th>
+                        <th>Horario</th>
+                        <th>URL</th>
+                        <th>Activo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="lineaApoyoBody">
+                    <tr><td colspan="6" class="text-center text-muted">Cargando líneas de apoyo...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

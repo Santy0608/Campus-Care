@@ -2,12 +2,14 @@ package com.campus_care.Campus_Care_Backend.serviceImpl;
 
 import com.campus_care.Campus_Care_Backend.domain.Autoevaluacion;
 import com.campus_care.Campus_Care_Backend.domain.Recursos;
+import com.campus_care.Campus_Care_Backend.repository.EjercicioPracticoRepository;
 import com.campus_care.Campus_Care_Backend.service.ClaudeService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -26,9 +28,10 @@ public class ClaudeServiceImpl implements ClaudeService {
 
     private static final Logger log = LoggerFactory.getLogger(ClaudeService.class);
 
+
     @Override
-    public List<RecomendacionInterna> refinarRecomendacion(Autoevaluacion autoevaluacion, List<Recursos> candidatos, String contextoDiario) {
-        String prompt  = construirPrompt(autoevaluacion, candidatos, contextoDiario);
+    public List<RecomendacionInterna> refinarRecomendacion(Autoevaluacion autoevaluacion, List<Recursos> candidatos, String contextoDiario, String catalogoEjercicios) {
+        String prompt  = construirPrompt(autoevaluacion, candidatos, contextoDiario, catalogoEjercicios);
 
         Map<String, Object> body = Map.of(
                 "model", "claude-sonnet-4-6",
@@ -73,7 +76,7 @@ public class ClaudeServiceImpl implements ClaudeService {
                 .orElseThrow(() -> new RuntimeException("Claude no devolvió texto"));
     }
 
-    private String construirPrompt(Autoevaluacion autoevaluacion, List<Recursos> candidatos, String contextoDiario) {
+    private String construirPrompt(Autoevaluacion autoevaluacion, List<Recursos> candidatos, String contextoDiario, String catalogoEjercicios) {
         String metricas = autoevaluacion.getRespuestas().stream()
                 .map(r -> r.getMetrica() + ": " + r.getScore() + "/5")
                 .collect(Collectors.joining(", "));
@@ -87,19 +90,24 @@ public class ClaudeServiceImpl implements ClaudeService {
                 ? ""
                 : "\nEl estudiante también escribió esto en su diario recientemente: \"" + truncar(contextoDiario, 300) + "\"\n";
 
-        return """
-        Eres un asistente de bienestar estudiantil. Un estudiante completó esta autoevaluación (escala 1-5, 1=malo, 5=bueno):
-        %s
-        %s
-        Estos son los recursos candidatos disponibles:
-        %s
+        String bloqueEjercicios = catalogoEjercicios == null || catalogoEjercicios.isBlank()
+                ? ""
+                : "\nEjercicios prácticos disponibles que puedes mencionar si aplica:\n" + catalogoEjercicios + "\n";
 
-        Selecciona y ordena hasta 3 recursos genuinamente relevantes para este estudiante según su estado actual.
-        Nunca repitas el mismo id más de una vez. Si hay menos de 3 recursos realmente relevantes, devuelve solo esos.
-        Si usaste el diario para justificar una recomendación, menciónalo brevemente en la razón.
-        Responde ÚNICAMENTE con un JSON válido, sin texto adicional, sin markdown, en este formato exacto:
-        [{"id": "...", "razon": "..."}]
-        """.formatted(metricas, bloqueDiario, recursosTexto);
+        return """
+    Eres un asistente de bienestar estudiantil. Un estudiante completó esta autoevaluación (escala 1-5, 1=malo, 5=bueno):
+    %s
+    %s
+    Estos son los recursos candidatos disponibles:
+    %s
+    %s
+    Selecciona y ordena hasta 3 recursos genuinamente relevantes para este estudiante según su estado actual.
+    Nunca repitas el mismo id más de una vez. Si hay menos de 3 recursos realmente relevantes, devuelve solo esos.
+    Si usaste el diario para justificar una recomendación, menciónalo brevemente en la razón.
+    Si algún ejercicio práctico del catálogo aplica bien al estado del estudiante, menciónalo por nombre en la razón del recurso más relacionado.
+    Responde ÚNICAMENTE con un JSON válido, sin texto adicional, sin markdown, en este formato exacto:
+    [{"id": "...", "razon": "..."}]
+    """.formatted(metricas, bloqueDiario, recursosTexto, bloqueEjercicios);
     }
 
     private List<RecomendacionClaude> parsearRespuesta(String texto) throws JsonProcessingException {

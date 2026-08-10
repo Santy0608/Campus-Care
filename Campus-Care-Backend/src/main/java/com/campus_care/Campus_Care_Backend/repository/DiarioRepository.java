@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 import java.util.List;
 
-@EnableMongoRepositories
 public interface DiarioRepository extends MongoRepository<Diario, String> {
 
     List<Diario> findByIdUsuario(String idUsuario);

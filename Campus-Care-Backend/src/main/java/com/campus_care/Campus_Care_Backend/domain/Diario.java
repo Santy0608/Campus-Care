@@ -5,13 +5,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.Date;
 
 @Document(collection = "diarios")
 public class Diario {
 
     @Id
-    String id;
+    private String id;
     @Field("id_usuario")
     private String idUsuario;
 
@@ -20,6 +21,9 @@ public class Diario {
 
     @Field("entrada_texto")
     private String entradaTexto;
+
+    public Diario() {
+    }
 
     public String getId(){
         return id;

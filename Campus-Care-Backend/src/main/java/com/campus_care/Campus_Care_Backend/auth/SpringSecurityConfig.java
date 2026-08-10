@@ -48,7 +48,7 @@ public class SpringSecurityConfig {
 
 
                         //Reglas para Usuarios
-                        .requestMatchers(HttpMethod.GET, "/api/usuarios/listado-usuarios").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios/listado-usuarios").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/usuarios/{idUsuario}").hasAnyRole("ESTUDIANTE", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/usuarios/agregar-usuario").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/usuarios/actualizar-usuario/{id}").hasRole("ADMIN")
@@ -64,42 +64,41 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/api/autoevaluaciones/{id}/recomendaciones").hasRole("ESTUDIANTE")
                         .requestMatchers(HttpMethod.GET,"/api/autoevaluaciones/hoy").hasRole("ESTUDIANTE")
                         //Reglas para Catalogo Logros
-                        .requestMatchers(HttpMethod.GET,"/api/catalogos-logros/listado-catalogos-logros").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/catalogos-logros/listado-catalogos-logros").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET,"/api/catalogos-logros/{id}").hasAnyRole("ESTUDIANTE","ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/catalogos-logros/agregar-catalogo-logro").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/catalogos-logros/actualizar-cactalogo-logro/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/catalogos-logros/eliminar-catalogo-logro/{id}").hasRole("ADMIN")
                         //Reglas para Diario
-                        .requestMatchers(HttpMethod.GET,"/api/diarios/listado-diarios").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/diarios/mis-diarios").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/diarios/mis-diarios").hasRole("ESTUDIANTE")
                         .requestMatchers(HttpMethod.POST,"/api/diarios/agregar-diario").hasRole("ESTUDIANTE")
                         .requestMatchers(HttpMethod.GET,"/api/diarios/{id}").hasRole("ESTUDIANTE")
                         //Reglas para Ejercicios Practicos
-                        .requestMatchers(HttpMethod.GET,"/api/ejercicios-practicos/listado-ejercicios-practicos").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/ejercicios-practicos/listado-ejercicios-practicos").hasRole("ESTUDIANTE")
                         .requestMatchers(HttpMethod.GET,"/api/ejercicios-practicos/{id}").hasAnyRole("ESTUDIANTE","ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/ejercicios-practicos/agregar-ejercicio-practico").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/ejercicios-practicos/actualizar-ejercicio-practico/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/ejercicios-practicos/eliminar-ejercicio-practico/{id}").hasRole("ADMIN")
                         //Reglas para Frases Motivacionales
-                        .requestMatchers(HttpMethod.GET,"/api/frases-motivacionales/listado-frases-motivacionales").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/frases-motivacionales/listado-frases-motivacionales").hasAnyRole("ESTUDIANTE","ADMIN")
                         .requestMatchers(HttpMethod.GET,"/api/frases-motivacionales/{id}").hasAnyRole("ESTUDIANTE","ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/frases-motivacionales/agregar-frase-motivacional").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/frases-motivacionales/actualizar-frase-motivacional").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/frases-motivacionales/eliminar-frase-motivacional/{id}").hasRole("ADMIN")
                         //Reglas para Lineas de Apoyo
-                        .requestMatchers(HttpMethod.GET,"/api/lineas-apoyo/listado-lineas-apoyo").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/lineas-apoyo/listado-lineas-apoyo").hasAnyRole("ESTUDIANTE","ADMIN")
                         .requestMatchers(HttpMethod.GET,"/api/lineas-apoyo/{id}").hasAnyRole("ESTUDIANTE","ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/agregar-linea-apoyo").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/actualizar-linea-apoyo/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/eliminar-linea-apoyo/{id}").hasRole("ADMIN")
                         //Reglas para Recursos
-                        .requestMatchers(HttpMethod.GET,"/api/recursos/listado-recursos").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/recursos/listado-recursos").hasAnyRole("ESTUDIANTE","ADMIN")
                         .requestMatchers(HttpMethod.GET,"/api/recursos/{id}").hasAnyRole("ESTUDIANTE","ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/recursos/agregar-recurso").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/recursos/actualizar-recurso/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/recursos/eliminar-recurso/{id}").hasRole("ADMIN")
                         //Reglas para Tipos Recursosrecurso
-                        .requestMatchers(HttpMethod.GET,"/api/tipos-recurso/listado-tipos-recurso").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/tipos-recurso/listado-tipos-recurso").hasAnyRole("ESTUDIANTE","ADMIN")
                         .requestMatchers(HttpMethod.GET,"/api/tipos-recurso/{id}").hasAnyRole("ESTUDIANTE","ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/tipos-recurso/agregar-tipos-recurso").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/tipos-recurso/actualizar-tipos-recurso/{id}").hasRole("ADMIN")

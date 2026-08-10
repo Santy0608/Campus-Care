@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,7 +60,7 @@ public class DiarioServiceImpl implements DiarioService {
         DiarioDTO dto = new DiarioDTO();
         dto.setId(diario.getId());
         dto.setIdUsuario(diario.getIdUsuario());
-        dto.setFecha(diario.getFecha());
+        dto.setFecha(Instant.now());
         dto.setEntradaTexto(diario.getEntradaTexto());
         return dto;
     }

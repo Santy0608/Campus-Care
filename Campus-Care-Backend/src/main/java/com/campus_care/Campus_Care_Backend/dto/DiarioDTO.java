@@ -1,11 +1,13 @@
 package com.campus_care.Campus_Care_Backend.dto;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.annotation.PersistenceCreator;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public class DiarioDTO {
 
@@ -15,20 +17,8 @@ public class DiarioDTO {
     private String entradaTexto;
 
     // 1. Constructor vacío obligatorio para instanciación por reflexión/JavaBeans
-    public DiarioDTO() {
-    }
+    public DiarioDTO(){
 
-    // 2. Constructor mapeado explícitamente para Spring Data
-    @PersistenceCreator
-    public DiarioDTO(
-            @Value("#root.id") String id,
-            @Value("#root.idUsuario") String idUsuario,
-            @Value("#root.fecha") Instant fecha,
-            @Value("#root.entradaTexto") String entradaTexto) {
-        this.id = id;
-        this.idUsuario = idUsuario;
-        this.fecha = fecha;
-        this.entradaTexto = entradaTexto;
     }
 
     public String getId() {

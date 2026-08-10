@@ -2,10 +2,7 @@ package com.campus_care.Campus_Care_Backend.serviceImpl;
 
 import com.campus_care.Campus_Care_Backend.domain.*;
 import com.campus_care.Campus_Care_Backend.dto.RecursosDTO;
-import com.campus_care.Campus_Care_Backend.repository.CategoriaRepository;
-import com.campus_care.Campus_Care_Backend.repository.DiarioRepository;
-import com.campus_care.Campus_Care_Backend.repository.RecursoVectorRepository;
-import com.campus_care.Campus_Care_Backend.repository.TiposRecursoRepository;
+import com.campus_care.Campus_Care_Backend.repository.*;
 import com.campus_care.Campus_Care_Backend.service.ClaudeService;
 import com.campus_care.Campus_Care_Backend.service.EmbeddingService;
 import com.campus_care.Campus_Care_Backend.service.RecomendadorService;
@@ -43,9 +40,13 @@ public class RecomendadorServiceImpl implements RecomendadorService {
     @Autowired
     private DiarioRepository diarioRepository;
 
+    @Autowired
+    private EjercicioPracticoRepository ejercicioPracticoRepository;
+
     @Override
     public List<RecursoRecomendado> recomendar(Autoevaluacion autoevaluacion) {
         String entradaDiario = obtenerUltimaEntradaDiario(autoevaluacion.getIdUsuario());
+        String catalogoEjericios = construirCatalogoEjercicios();
 
         String textoConsulta = construirTextoConsulta(autoevaluacion);
         float[] queryEmbedding = embeddingService.generarEmbedding(textoConsulta);
@@ -53,7 +54,7 @@ public class RecomendadorServiceImpl implements RecomendadorService {
 
         // Claude decide el orden final / justificación, no solo el score coseno
         List<ClaudeService.RecomendacionInterna> refinadas =
-                claudeService.refinarRecomendacion(autoevaluacion, candidatos, entradaDiario);
+                claudeService.refinarRecomendacion(autoevaluacion, candidatos, entradaDiario, catalogoEjericios);
 
         return convertirAPublico(refinadas);
 
@@ -103,6 +104,19 @@ public class RecomendadorServiceImpl implements RecomendadorService {
                         recursoService.convertirADTOListado(r.recurso(), categoriasMap, tiposMap),
                         r.razon()))
                 .collect(Collectors.toList());
+    }
+
+    private String construirCatalogoEjercicios() {
+        return ejercicioPracticoRepository.findByActivoTrue().stream()
+                .map(e -> "- " + e.getNombre() + ": " + resumenInstrucciones(e.getInstrucciones()))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String resumenInstrucciones(List<String> instrucciones) {
+        if (instrucciones == null || instrucciones.isEmpty()) return "";
+        return instrucciones.size() <= 2
+                ? String.join(". ", instrucciones)
+                : instrucciones.get(0) + "...";
     }
 
 

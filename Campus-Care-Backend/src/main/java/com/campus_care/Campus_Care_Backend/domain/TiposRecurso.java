@@ -2,16 +2,13 @@ package com.campus_care.Campus_Care_Backend.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "categoria")
-public class Categoria {
+@Document(collection = "tipos_recurso")
+public class TiposRecurso {
 
     @Id
     private String id;
-    @Field("nombre")
     private String nombre;
-    @Field("descripcion")
     private String descripcion;
 
     public String getId(){
@@ -37,6 +34,5 @@ public class Categoria {
     public void setDescripcion(String descripcion){
         this.descripcion = descripcion;
     }
-
 
 }

@@ -1,17 +1,9 @@
-package com.campus_care.Campus_Care_Backend.domain;
+package com.campus_care.Campus_Care_Backend.dto;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+public class TiposRecursoDTO {
 
-@Document(collection = "categoria")
-public class Categoria {
-
-    @Id
     private String id;
-    @Field("nombre")
     private String nombre;
-    @Field("descripcion")
     private String descripcion;
 
     public String getId(){
@@ -37,6 +29,7 @@ public class Categoria {
     public void setDescripcion(String descripcion){
         this.descripcion = descripcion;
     }
+
 
 
 }

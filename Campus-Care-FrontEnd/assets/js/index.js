@@ -131,17 +131,7 @@ function obtenerFlagNotificacion() {
     return true;
 }
 
-// ─── Frase del Día ────────────────────────────────────────────────────────────
 
-/**
- * Carga la frase motivacional del día desde el backend y la pinta en
- * el <blockquote id="frase-dia">. Si falla o el endpoint todavía no
- * existe, deja un mensaje claro en vez de "Cargando..." infinito.
- *
- * TODO: confirmar la ruta real del endpoint con el backend. Se asume
- * algo como GET /api/frases-motivacionales/aleatoria que devuelve
- * { texto, autor }. Ajustar cuando esté confirmado.
- */
 async function cargarFraseDelDia() {
     const el = document.getElementById('frase-dia');
     if (!el) return;
@@ -152,10 +142,20 @@ async function cargarFraseDelDia() {
     }
 
     try {
-        // TODO: confirmar ruta real del endpoint
-        const frase = await window.CampusCareApi.request('/api/frases-motivacionales/aleatoria');
-        el.textContent = frase.autor ? `"${frase.texto}" — ${frase.autor}` : frase.texto;
+        const frases = await window.CampusCareApi.request('/api/frases-motivacionales/listado-frases-motivacionales');
+        const activas = Array.isArray(frases) ? frases.filter(f => f.activo) : [];
+
+        if (activas.length === 0) {
+            el.textContent = 'Vuelve pronto para descubrir tu frase del día.';
+            return;
+        }
+
+        const frase = activas[Math.floor(Math.random() * activas.length)];
+        el.textContent = frase.autor
+            ? `"${frase.texto}" — ${frase.autor}`
+            : `"${frase.texto}"`;
     } catch (error) {
+        console.error('Error cargando frase del día:', error);
         el.textContent = 'No se pudo cargar la frase del día.';
     }
 }

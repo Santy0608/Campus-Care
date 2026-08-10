@@ -26,27 +26,33 @@ function renderNavbar(usuario) {
 
     if (usuario && usuario.role === 'estudiante') {
         roleLinks = `
-            <li class="nav-item">
-                <a class="nav-link" href="/modules/autoevaluacion/autoevaluacion.html" title="Evalua tu estado emocional">
-                    <i class="fas fa-heart me-1"></i>Autoevaluación
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/modules/dashboard/dashboard_progreso.html" title="Ve tu progreso emocional">
-                    <i class="fas fa-chart-line me-1"></i>Mi Progreso
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/modules/diario/indexDiario.html" title="Registra tus reflexiones">
-                    <i class="fas fa-book-open me-1"></i>Mi Diario
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/modules/resources_student/recursos_estudiantes.html" title="Recursos de bienestar">
-                    <i class="fas fa-seedling me-1"></i>Mis Recursos
-                </a>
-            </li>`
-            ;
+        <li class="nav-item">
+            <a class="nav-link" href="/modules/autoevaluacion/autoevaluacion.html" title="Evalua tu estado emocional">
+                <i class="fas fa-heart me-1"></i>Autoevaluación
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/modules/dashboard/dashboard_progreso.html" title="Ve tu progreso emocional">
+                <i class="fas fa-chart-line me-1"></i>Mi Progreso
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/modules/diario/indexDiario.html" title="Registra tus reflexiones">
+                <i class="fas fa-book-open me-1"></i>Mi Diario
+            </a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="dropdownRecursos" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Recursos de bienestar">
+                <i class="fas fa-seedling me-1"></i>Recursos
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownRecursos">
+                <li><a class="dropdown-item" href="/modules/resources_student/recursos_estudiantes.html"><i class="fas fa-seedling me-2"></i>Mis Recursos</a></li>
+                <li><a class="dropdown-item" href="/modules/ejercicios_practicos/ejercicios_practicos.html"><i class="fas fa-spa me-2"></i>Ejercicios Prácticos</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/modules/lineas_apoyo_student/lineas_apoyo_student.html"><i class="fas fa-phone-volume me-2"></i>Líneas de Apoyo</a></li>
+            </ul>
+        </li>`
+        ;
     } else if (usuario && usuario.role === 'admin') {
         roleLinks = `
             <li class="nav-item dropdown">

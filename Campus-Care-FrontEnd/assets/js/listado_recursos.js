@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formulario: document.getElementById('formBusqueda'),
         buscar: document.getElementById('campoBuscar'),
         limpiar: document.getElementById('limpiarBusqueda'),
+        reindexar: document.getElementById('btnReindexar'), 
     };
     const estado = { recursos: [], termino: '' };
 
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const boton = event.target.closest('[data-accion="eliminar"]');
         if (boton) eliminarRecurso(boton.dataset.id);
     });
+    ui.reindexar?.addEventListener('click', reindexarRecursos);
 
     async function cargarRecursos() {
         mostrarEstado('Cargando recursos...');
@@ -176,6 +178,34 @@ document.addEventListener('DOMContentLoaded', () => {
         ui.mensaje.className = `alert alert-${tipo} mt-3`;
         ui.mensaje.textContent = texto;
     }
+
+
+     async function reindexarRecursos() {
+        const textoOriginal = ui.reindexar.innerHTML;
+        ui.reindexar.disabled = true;
+        ui.reindexar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Reindexando...';
+
+        try {
+            const resultado = await api.request('/api/admin/recursos/reindexar', {
+                method: 'POST',
+            });
+
+            await Swal.fire({
+                title: 'Reindexación completa',
+                text: `${resultado.exitosos} exitosos, ${resultado.fallidos} fallidos de ${resultado.total} recursos.`,
+                icon: resultado.fallidos > 0 ? 'warning' : 'success',
+            });
+
+            await cargarRecursos(); // refresca la tabla por si algo cambió
+        } catch (error) {
+            mostrarMensaje(error.message || 'No se pudo reindexar los recursos.', 'danger');
+        } finally {
+            ui.reindexar.disabled = false;
+            ui.reindexar.innerHTML = textoOriginal;
+        }
+    }
+
+
 
     cargarRecursos();
 });

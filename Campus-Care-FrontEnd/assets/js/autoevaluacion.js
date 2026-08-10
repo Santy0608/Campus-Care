@@ -46,7 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const pct = ((range.value - range.min) / (range.max - range.min)) * 100;
                     range.style.setProperty('--thumb-position', pct + '%');
                 }
-                range.dataset.touched = 'true';
             };
             range.addEventListener('input', update);
             range.addEventListener('change', update);
@@ -100,24 +99,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         form.classList.remove('d-none');
     });
 
-    function validarFormulario() {
-        let isValid = true;
-        document.querySelectorAll('.form-range').forEach(range => {
-            if (range.dataset.touched !== 'true') {
-                isValid = false;
-                range.style.borderColor = '#ff6b6b';
-            } else {
-                range.style.borderColor = '';
-            }
-        });
-
-        if (!isValid) {
-            errorBox.textContent = 'Por favor, ajustá todas las categorías antes de guardar.';
-            errorBox.classList.remove('d-none');
-        }
-
-        return isValid;
-    }
+    // FIX: se eliminó validarFormulario() y su chequeo de range.dataset.touched.
+    // Un <input type="range"> siempre tiene un valor válido (nunca queda "vacío"),
+    // así que un estudiante que deja una categoría en 3 sin tocarla está dando
+    // una respuesta real (neutral), no omitiendo una respuesta. Validar por
+    // "touched" rechazaba formularios completos y válidos.
 
     // FIX: antes había DOS listeners de submit casi idénticos registrados con
     // addEventListener — no se reemplazan entre sí, se ACUMULAN. Cada submit
@@ -128,8 +114,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         errorBox.classList.add('d-none');
-
-        if (!validarFormulario()) return;
 
         const payload = {
             idUsuario: usuario.id,
@@ -145,14 +129,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: payload,
             });
             mostrarResumen(resultado);
-            mostrarModalPuntos(resultado.puntosGanados);
+            const frase = await obtenerFraseAleatoria();
+            mostrarModalPuntos(resultado.puntosGanados, frase);
         } catch (error) {
             errorBox.textContent = error.message || 'Ocurrió un error al guardar la evaluación.';
             errorBox.classList.remove('d-none');
         }
     });
 
-    function mostrarModalPuntos(puntos) {
+    async function obtenerFraseAleatoria() {
+    try {
+        const frases = await window.CampusCareApi.request('/api/frases-motivacionales/listado-frases-motivacionales');
+        const activas = Array.isArray(frases) ? frases.filter(f => f.activo) : [];
+        if (activas.length === 0) return null;
+        return activas[Math.floor(Math.random() * activas.length)];
+    } catch (error) {
+        console.error('Error cargando frase motivacional:', error);
+        return null; 
+    }
+}
+
+    function mostrarModalPuntos(puntos, frase) {
         const modalBody = document.getElementById('modal-felicitacion-body');
         modalBody.innerHTML = `
             <p class="lead">¡Has completado tu autoevaluación de hoy!</p>
@@ -161,6 +158,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <p class="text-muted mb-0">puntos ganados</p>
             </div>
             <p class="h5">¡Seguí así para mantener tu racha! 🔥</p>
+
+             ${frase ? `
+            <hr class="my-3">
+            <blockquote class="blockquote">
+                <p class="fst-italic mb-1">"${window.CampusCareApi.escapeHtml(frase.texto)}"</p>
+                ${frase.autor ? `<footer class="blockquote-footer text-white-50">${window.CampusCareApi.escapeHtml(frase.autor)}</footer>` : ''}
+            </blockquote>
+        ` : ''}
         `;
         const felicitacionModal = new bootstrap.Modal(document.getElementById('modal-felicitacion'));
         felicitacionModal.show();

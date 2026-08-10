@@ -27,8 +27,8 @@ public class ClaudeServiceImpl implements ClaudeService {
     private static final Logger log = LoggerFactory.getLogger(ClaudeService.class);
 
     @Override
-    public List<RecomendacionInterna> refinarRecomendacion(Autoevaluacion autoevaluacion, List<Recursos> candidatos) {
-        String prompt  = construirPrompt(autoevaluacion, candidatos);
+    public List<RecomendacionInterna> refinarRecomendacion(Autoevaluacion autoevaluacion, List<Recursos> candidatos, String contextoDiario) {
+        String prompt  = construirPrompt(autoevaluacion, candidatos, contextoDiario);
 
         Map<String, Object> body = Map.of(
                 "model", "claude-sonnet-4-6",
@@ -73,7 +73,7 @@ public class ClaudeServiceImpl implements ClaudeService {
                 .orElseThrow(() -> new RuntimeException("Claude no devolvió texto"));
     }
 
-    private String construirPrompt(Autoevaluacion autoevaluacion, List<Recursos> candidatos) {
+    private String construirPrompt(Autoevaluacion autoevaluacion, List<Recursos> candidatos, String contextoDiario) {
         String metricas = autoevaluacion.getRespuestas().stream()
                 .map(r -> r.getMetrica() + ": " + r.getScore() + "/5")
                 .collect(Collectors.joining(", "));
@@ -83,18 +83,23 @@ public class ClaudeServiceImpl implements ClaudeService {
                         r.getId(), r.getTitulo(), truncar(r.getContenido(), 200)))
                 .collect(Collectors.joining("\n"));
 
+        String bloqueDiario = contextoDiario == null || contextoDiario.isBlank()
+                ? ""
+                : "\nEl estudiante también escribió esto en su diario recientemente: \"" + truncar(contextoDiario, 300) + "\"\n";
+
         return """
-            Eres un asistente de bienestar estudiantil. Un estudiante completó esta autoevaluación (escala 1-5, 1=malo, 5=bueno):
-            %s
-        
-            Estos son los recursos candidatos disponibles:
-            %s
-        
-            Selecciona y ordena hasta 3 recursos genuinamente relevantes para este estudiante según su estado actual.
-            Nunca repitas el mismo id más de una vez. Si hay menos de 3 recursos realmente relevantes, devuelve solo esos.
-            Responde ÚNICAMENTE con un JSON válido, sin texto adicional, sin markdown, en este formato exacto:
-            [{"id": "...", "razon": "..."}]
-            """.formatted(metricas, recursosTexto);
+        Eres un asistente de bienestar estudiantil. Un estudiante completó esta autoevaluación (escala 1-5, 1=malo, 5=bueno):
+        %s
+        %s
+        Estos son los recursos candidatos disponibles:
+        %s
+
+        Selecciona y ordena hasta 3 recursos genuinamente relevantes para este estudiante según su estado actual.
+        Nunca repitas el mismo id más de una vez. Si hay menos de 3 recursos realmente relevantes, devuelve solo esos.
+        Si usaste el diario para justificar una recomendación, menciónalo brevemente en la razón.
+        Responde ÚNICAMENTE con un JSON válido, sin texto adicional, sin markdown, en este formato exacto:
+        [{"id": "...", "razon": "..."}]
+        """.formatted(metricas, bloqueDiario, recursosTexto);
     }
 
     private List<RecomendacionClaude> parsearRespuesta(String texto) throws JsonProcessingException {

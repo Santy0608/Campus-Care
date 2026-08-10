@@ -11,5 +11,6 @@ public interface DiarioRepository extends MongoRepository<Diario, String> {
 
     List<Diario> findByIdUsuario(String idUsuario);
 
+    List<Diario> findByIdUsuarioOrderByFechaDesc(String idUsuario);
 
 }

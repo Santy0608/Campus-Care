@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ClaudeService {
 
-    List<ClaudeServiceImpl.RecomendacionInterna> refinarRecomendacion(Autoevaluacion autoevaluacion, List<Recursos> candidatos);
+    List<ClaudeServiceImpl.RecomendacionInterna> refinarRecomendacion(Autoevaluacion autoevaluacion, List<Recursos> candidatos, String contextoDiario);
 
     record RecomendacionInterna(Recursos recurso, String razon) {}
 

@@ -14,6 +14,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const dashboard = await window.CampusCareApi.request(`/api/dashboard/estudiante/${usuario.id}`);
         renderDashboard(dashboard);
+
+         // Solo pedimos recomendaciones si hay al menos una autoevaluación
+        if (dashboard.ultimaAutoevaluacionId) {
+            cargarRecomendaciones(dashboard.ultimaAutoevaluacionId);
+        } else {
+            document.getElementById('recomendacionesLoading').classList.add('d-none');
+        }
     } catch (error) {
         console.error('Error cargando dashboard:', error);
         document.getElementById('estadoVacio').classList.remove('d-none');
@@ -115,6 +122,59 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             `;
         }).join('');
+    }
+
+     async function cargarRecomendaciones(autoevaluacionId) {
+        const loading = document.getElementById('recomendacionesLoading');
+        const errorBox = document.getElementById('recomendacionesError');
+        const container = document.getElementById('recomendacionesContainer');
+
+        try {
+            const recomendaciones = await window.CampusCareApi.request(
+                `/api/autoevaluaciones/${autoevaluacionId}/recomendaciones`
+            );
+
+            loading.classList.add('d-none');
+
+            if (!recomendaciones || recomendaciones.length === 0) {
+                errorBox.textContent = 'No encontramos recursos recomendados por ahora.';
+                errorBox.classList.remove('d-none');
+                return;
+            }
+
+            container.innerHTML = recomendaciones.map(rec => `
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-primary">
+                        <div class="card-body d-flex flex-column">
+                            <span class="badge bg-primary-subtle text-primary mb-2 align-self-start">${escapeHtml(rec.recurso.tipoRecursoNombre)}</span>
+                            <h6 class="card-title">${escapeHtml(rec.recurso.titulo)}</h6>
+                            <p class="card-text text-muted small flex-grow-1">${escapeHtml(rec.recurso.contenido)}</p>
+                            <p class="small fst-italic text-primary mb-2">${escapeHtml(rec.razon)}</p>
+                            <a href="${escapeAttr(rec.recurso.urlEnlace)}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm mt-auto">
+                                Ver recurso <i class="fas fa-arrow-up-right-from-square ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.classList.remove('d-none');
+
+        } catch (error) {
+            console.error('Error cargando recomendaciones:', error);
+            loading.classList.add('d-none');
+            errorBox.classList.remove('d-none');
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text ?? '';
+        return div.innerHTML;
+    }
+
+    function escapeAttr(url) {
+        return encodeURI(url ?? '#');
     }
 
 

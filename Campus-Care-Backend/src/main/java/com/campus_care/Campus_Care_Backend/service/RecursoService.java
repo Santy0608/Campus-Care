@@ -4,6 +4,7 @@ import com.campus_care.Campus_Care_Backend.domain.Recursos;
 import com.campus_care.Campus_Care_Backend.dto.RecursosDTO;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface RecursoService {
@@ -17,5 +18,7 @@ public interface RecursoService {
     RecursosDTO actualizarRecurso(RecursosDTO recursosDTO, String id);
 
     void elimianrRecursoPorId(String id);
+
+    RecursosDTO convertirADTOListado(Recursos recursos, Map<String, String> categoriasMap, Map<String, String> tiposMap);
 
 }

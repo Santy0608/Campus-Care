@@ -26,6 +26,7 @@ public class DashboardAdminDTO {
     @JsonProperty("avg_motivacion")
     private double avgMotivacion;
 
+
     public Long getTotalEstudiantes(){
         return totalEstudiantes;
     }

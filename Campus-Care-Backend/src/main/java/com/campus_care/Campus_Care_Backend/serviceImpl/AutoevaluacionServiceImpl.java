@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.yaml.snakeyaml.events.Event;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -174,6 +175,7 @@ public class AutoevaluacionServiceImpl implements AutoevaluacionService {
         }
         return racha;
     }
+
 
     AutoevaluacionDTO convertirADTO(Autoevaluacion autoevaluacion){
         AutoevaluacionDTO dto = new AutoevaluacionDTO();

@@ -7,6 +7,7 @@ import com.campus_care.Campus_Care_Backend.dto.RecursosDTO;
 import com.campus_care.Campus_Care_Backend.repository.CategoriaRepository;
 import com.campus_care.Campus_Care_Backend.repository.RecursoRepository;
 import com.campus_care.Campus_Care_Backend.repository.TiposRecursoRepository;
+import com.campus_care.Campus_Care_Backend.service.EmbeddingService;
 import com.campus_care.Campus_Care_Backend.service.RecursoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class RecursoServiceImpl implements RecursoService {
 
     @Autowired
     private TiposRecursoRepository tiposRecursoRepository;
+
+    @Autowired
+    private EmbeddingService embeddingService;
 
     @Override
     public List<RecursosDTO> listadoRecursos() {
@@ -80,6 +84,9 @@ public class RecursoServiceImpl implements RecursoService {
         recurso.setFechaPublicacion(LocalDateTime.now());
         recurso.setActivo(recursosDTO.isActivo());
 
+        String textoEmbedding = recurso.getTitulo() + ". " + recurso.getContenido();
+        recurso.setEmbedding(embeddingService.generarEmbedding(textoEmbedding));
+
         Recursos recursoGuardado = recursoRepository.save(recurso);
 
         return convertirADTO(recursoGuardado);
@@ -104,6 +111,9 @@ public class RecursoServiceImpl implements RecursoService {
                     recursos.setTipoRecursoId(tiposRecurso.getId());
                     recursos.setFechaPublicacion(LocalDateTime.now());
                     recursos.setActivo(recursosDTO.isActivo());
+
+                    String textoEmbedding = recursos.getTitulo() + ". " + recursos.getContenido();
+                    recursos.setEmbedding(embeddingService.generarEmbedding(textoEmbedding));
 
                     Recursos recursoActualizado = recursoRepository.save(recursos);
                     return convertirADTO(recursoActualizado);
@@ -137,7 +147,7 @@ public class RecursoServiceImpl implements RecursoService {
         return dto;
     }
 
-    RecursosDTO convertirADTOListado(Recursos recursos, Map<String, String> categoriasMap, Map<String, String> tiposMap) {
+    public RecursosDTO convertirADTOListado(Recursos recursos, Map<String, String> categoriasMap, Map<String, String> tiposMap) {
         RecursosDTO dto = new RecursosDTO();
         dto.setId(recursos.getId());
         dto.setTitulo(recursos.getTitulo());

@@ -23,6 +23,17 @@ public class Recursos {
     private LocalDateTime fechaPublicacion;
     private boolean activo;
 
+    @Field("embedding")
+    private float[] embedding;
+
+    public float[] getEmbedding(){
+        return embedding;
+    }
+
+    public void setEmbedding(float[] embedding){
+        this.embedding = embedding;
+    }
+
     public String getId() {
         return id;
     }

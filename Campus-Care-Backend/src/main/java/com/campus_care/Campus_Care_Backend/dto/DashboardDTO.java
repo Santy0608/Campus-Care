@@ -12,6 +12,16 @@ public class DashboardDTO {
 
     private int puntosTotales;
 
+    private String ultimaAutoevaluacionId;
+
+    public String getUltimaAutoevaluacionId(){
+        return ultimaAutoevaluacionId;
+    }
+
+    public void setUltimaAutoevaluacionId(String ultimaAutoevaluacionId){
+        this.ultimaAutoevaluacionId = ultimaAutoevaluacionId;
+    }
+
     public int getRachaActual(){
         return rachaActual;
     }

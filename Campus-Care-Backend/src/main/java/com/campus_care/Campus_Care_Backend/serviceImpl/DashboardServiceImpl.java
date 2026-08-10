@@ -100,6 +100,13 @@ public class DashboardServiceImpl implements DashboardService {
         dashboard.setRachaActual(autoevaluacionService.calcularRacha(idUsuario));
         dashboard.setPuntosTotales(obtenerPuntosTotales(idUsuario));
 
+        dashboard.setUltimaAutoevaluacionId(
+                evaluaciones.stream()
+                        .max(Comparator.comparing(Autoevaluacion::getFechaEvaluacion))
+                        .map(Autoevaluacion::getId)
+                        .orElse(null)
+        );
+
         return dashboard;
     }
 

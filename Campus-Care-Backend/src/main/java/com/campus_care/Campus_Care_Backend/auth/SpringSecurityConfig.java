@@ -61,6 +61,8 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.DELETE,"/api/categorias/eliminar-categoria/{id}").hasRole("ADMIN")
                         //Reglas para Autoevaluacion
                         .requestMatchers(HttpMethod.POST,"/api/autoevaluaciones/guardar-autoevaluacion").hasRole("ESTUDIANTE")
+                        .requestMatchers(HttpMethod.GET,"/api/autoevaluaciones/{id}/recomendaciones").hasRole("ESTUDIANTE")
+                        .requestMatchers(HttpMethod.GET,"/api/autoevaluaciones/hoy").hasRole("ESTUDIANTE")
                         //Reglas para Catalogo Logros
                         .requestMatchers(HttpMethod.GET,"/api/catalogos-logros/listado-catalogos-logros").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/catalogos-logros/{id}").hasAnyRole("ESTUDIANTE","ADMIN")
@@ -106,6 +108,9 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/api/dashboard/estudiante/{idUsuario}").hasRole("ESTUDIANTE")
                         //Reglas para Dashboard Admin
                         .requestMatchers(HttpMethod.GET,"/api/dashboard-admin").hasRole("ADMIN")
+
+                        //Reglas para Reindexar
+                        .requestMatchers(HttpMethod.POST, "/api/admin/recursos/reindexar").hasRole("ADMIN")
 
                         .anyRequest().authenticated())
                 .cors(cors -> cors.configurationSource(configurationSource()))
